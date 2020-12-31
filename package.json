@@ -1,0 +1,14 @@
+{
+    "name": "dotodo",
+    "version": "1.0.0",
+    "description": "Simple TODOs tracker",
+    "main": "index.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "author": "Miho Krusic",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^11.1.1"
+    }
+}
