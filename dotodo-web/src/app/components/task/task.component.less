@@ -1,0 +1,39 @@
+div.container {
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.75);
+    color: #353535;
+    display: flex;
+    align-items: stretch;
+    user-select: none;
+    line-height: 64px;
+
+    > mat-icon {
+        color: #dbdbdb;
+    }
+
+    > div {
+        flex: 1;
+        font-size: 1.2rem;
+    }
+
+    .drag {
+        align-self: center;
+        margin: 0 8px;
+    }
+
+    button.done mat-icon {
+        color: #37d7b2;
+        font-size: 2rem;
+        height: inherit;
+        width: inherit;
+    }
+
+    button.revert mat-icon {
+        background: #ff665e;
+        border-radius: 50%;
+        display: block;
+        padding: 4px;
+        color: white;
+    }
+}

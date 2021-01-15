@@ -1,0 +1,13 @@
+<div class="container">
+    <mat-icon class="drag">drag_indicator</mat-icon>
+    <div>{{ task.text }}</div>
+    <button mat-button class="done" *ngIf="!task.done" (click)="onTaskDone()">
+        <mat-icon>check_circle</mat-icon>
+    </button>
+    <button mat-button class="revert" *ngIf="task.done" (click)="onTaskRevert()">
+        <mat-icon>undo</mat-icon>
+    </button>
+    <!-- <button mat-button>
+        <mat-icon>delete</mat-icon>
+    </button> -->
+</div>

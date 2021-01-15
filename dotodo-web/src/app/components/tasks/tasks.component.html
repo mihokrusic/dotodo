@@ -1,0 +1,19 @@
+<app-tasks-progress [tasks]="tasks" [completedTasks]="completedTasks"></app-tasks-progress>
+
+<app-task-new (add)="taskAdd($event)"></app-task-new>
+<div class="tasks" cdkDropList>
+    <app-task cdkDrag [task]="item" *ngFor="let item of tasks; trackBy: trackByFn" (done)="taskDone($event)">
+    </app-task>
+</div>
+<div>
+    <div class="completed">
+        <button mat-button [class.expanded]="showCompletedTasks" (click)="showHideCompletedTasks()">
+            Completed ({{ completedTasks.length }})
+            <mat-icon>chevron_right</mat-icon>
+        </button>
+    </div>
+    <div class="tasks" [class.hide]="!showCompletedTasks">
+        <app-task [task]="item" *ngFor="let item of completedTasks; trackBy: trackByFn" (revert)="taskRevert($event)">
+        </app-task>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="toolbar">
+    <div class="period">
+        <ng-container *ngIf="currentPeriod.type === PeriodType.Daily">
+            <span class="subtitle">{{ getWeekday() }}</span>
+            <span class="title">{{ getDate() }}</span>
+        </ng-container>
+        <ng-container *ngIf="currentPeriod.type === PeriodType.Weekly">
+            <span class="subtitle">week</span>
+            <span class="title">{{ getWeek() }}</span>
+        </ng-container>
+        <ng-container *ngIf="currentPeriod.type === PeriodType.Monthly">
+            <span class="subtitle">month</span>
+            <span class="title">{{ getMonth() }}</span>
+        </ng-container>
+    </div>
+    <!-- <button type="button" (click)="switch(PeriodType.Daily)">D</button>
+    <button type="button" (click)="switch(PeriodType.Weekly)">W</button>
+    <button type="button" (click)="switch(PeriodType.Monthly)">M</button>
+    <button type="button" (click)="now()">Now</button> -->
+    <button mat-button disableRipple type="button" (click)="prev()">
+        <mat-icon>navigate_before</mat-icon>
+    </button>
+    <button mat-button disableRipple type="button" (click)="next()">
+        <mat-icon>navigate_next</mat-icon>
+    </button>
+</div>

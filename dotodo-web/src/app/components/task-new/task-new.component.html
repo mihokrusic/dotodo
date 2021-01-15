@@ -1,0 +1,6 @@
+<form class="container" [formGroup]="newTaskForm" (ngSubmit)="onSubmit()">
+    <input formControlName="text" type="text" placeholder="Add New Task..." />
+    <button mat-button>
+        <mat-icon>add_circle</mat-icon>
+    </button>
+</form>
