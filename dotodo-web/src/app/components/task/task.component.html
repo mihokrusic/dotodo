@@ -7,7 +7,7 @@
     <button mat-button class="revert" *ngIf="task.done" (click)="onTaskRevert()">
         <mat-icon>undo</mat-icon>
     </button>
-    <!-- <button mat-button>
+    <button mat-button (click)="onTaskDelete()">
         <mat-icon>delete</mat-icon>
-    </button> -->
+    </button>
 </div>

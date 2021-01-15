@@ -2,7 +2,13 @@
 
 <app-task-new (add)="taskAdd($event)"></app-task-new>
 <div class="tasks" cdkDropList>
-    <app-task cdkDrag [task]="item" *ngFor="let item of tasks; trackBy: trackByFn" (done)="taskDone($event)">
+    <app-task
+        cdkDrag
+        [task]="item"
+        *ngFor="let item of tasks; trackBy: trackByFn"
+        (done)="taskDone($event)"
+        (delete)="taskDelete($event)"
+    >
     </app-task>
 </div>
 <div>
@@ -13,7 +19,12 @@
         </button>
     </div>
     <div class="tasks" [class.hide]="!showCompletedTasks">
-        <app-task [task]="item" *ngFor="let item of completedTasks; trackBy: trackByFn" (revert)="taskRevert($event)">
+        <app-task
+            [task]="item"
+            *ngFor="let item of completedTasks; trackBy: trackByFn"
+            (revert)="taskRevert($event)"
+            (delete)="taskDelete($event)"
+        >
         </app-task>
     </div>
 </div>

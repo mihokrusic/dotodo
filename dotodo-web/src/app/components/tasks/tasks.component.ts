@@ -56,4 +56,8 @@ export class TasksComponent implements OnInit {
     taskRevert(task: Task) {
         this.tasksService.revert(task);
     }
+
+    taskDelete(task: Task) {
+        this.tasksService.delete(task);
+    }
 }

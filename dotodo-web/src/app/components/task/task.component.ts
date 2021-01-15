@@ -11,16 +11,13 @@ export class TaskComponent implements OnInit {
 
     @Output() done = new EventEmitter<Task>();
     @Output() revert = new EventEmitter<Task>();
+    @Output() delete = new EventEmitter<Task>();
 
     constructor() {}
 
     ngOnInit(): void {}
 
-    onTaskDone() {
-        this.done.emit(this.task);
-    }
-
-    onTaskRevert() {
-        this.revert.emit(this.task);
-    }
+    onTaskDone = () => this.done.emit(this.task);
+    onTaskRevert = () => this.revert.emit(this.task);
+    onTaskDelete = () => this.delete.emit(this.task);
 }

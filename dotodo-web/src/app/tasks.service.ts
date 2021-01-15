@@ -51,6 +51,11 @@ export class TasksService {
         this.updateTaskAfterMark(id, false);
     }
 
+    delete({ id }: Task) {
+        this.ipc.send('delete-task', { id });
+        this.removeTaskAfterDelete(id);
+    }
+
     private updateTaskAfterMark(id, done) {
         const tasks = this.tasksRx.value.map((t) => {
             if (t.id !== id) {
@@ -61,6 +66,15 @@ export class TasksService {
                 ...t,
                 done,
             };
+        });
+        this.tasksRx.next(tasks);
+    }
+
+    private removeTaskAfterDelete(id) {
+        const tasks = this.tasksRx.value.filter((t) => {
+            if (t.id !== id) {
+                return t;
+            }
         });
         this.tasksRx.next(tasks);
     }
@@ -78,19 +92,7 @@ export class TasksService {
         });
 
         // TODO: right now, we're updating immediately after user action; not waiting for reply
-        // this.ipc.on('check-task-reply', (event, arg) => {
-        //     const { id, done } = arg;
-        //     const tasks = this.tasksRx.value.map((t) => {
-        //         if (t.id !== id) {
-        //             return t;
-        //         }
-
-        //         return {
-        //             ...t,
-        //             done,
-        //         };
-        //     });
-        //     this.tasksRx.next(tasks);
-        // });
+        // this.ipc.on('check-task-reply', (event, arg) => {});
+        // this.ipc.on('delete-task-reply', (event, arg) => {});
     }
 }

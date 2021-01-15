@@ -26,6 +26,7 @@ class TaskService {
             where: {
                 type,
                 date: _getDate(type, date),
+                deleted: false,
             },
             order: ['done', ['createdAt', 'desc']],
             raw: true,

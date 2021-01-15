@@ -30,6 +30,12 @@ const init = () => {
         const task = await tasksService.markTask(arg.id, arg.done);
         event.reply('check-task-reply', task.toJSON());
     });
+
+    ipcMain.on('delete-task', async (event, arg) => {
+        console.log('delete-task');
+        const task = await tasksService.deleteTask(arg.id);
+        event.reply('delete-task-reply', task.toJSON());
+    });
 };
 
 module.exports = init;
