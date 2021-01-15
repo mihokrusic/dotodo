@@ -1,12 +1,8 @@
 import { Injectable } from '@angular/core';
+import { IpcRenderer } from 'electron';
 import { BehaviorSubject } from 'rxjs';
-
-export interface Task {
-    id: number;
-    text: string;
-    done: boolean;
-    deleted: boolean;
-}
+import { Period, Task } from './interfaces';
+import { SelectedPeriodService } from './selected-period.service';
 
 let id = 3;
 
@@ -17,49 +13,84 @@ export class TasksService {
     private tasksRx = new BehaviorSubject<Task[]>([]);
     tasks$ = this.tasksRx.asObservable();
 
-    constructor() {
-        this.tasksRx.next([
-            { id: 1, text: 'Do this and that', done: false, deleted: false },
-            { id: 2, text: 'Do this and that', done: false, deleted: false },
-            { id: 3, text: 'Do this and that', done: false, deleted: false },
-        ]);
+    private currentPeriod: Period;
+    private ipc: IpcRenderer | undefined = void 0;
+
+    constructor(private selectedPeriodService: SelectedPeriodService) {
+        if ((window as any).require) {
+            try {
+                this.ipc = (window as any).require('electron').ipcRenderer;
+            } catch (e) {
+                throw e;
+            }
+        } else {
+            console.warn('Electron IPC was not loaded');
+        }
+
+        this.selectedPeriodService.currentPeriod$.subscribe((period) => (this.currentPeriod = period));
+
+        this.registerListeners();
+    }
+
+    getTasks() {
+        this.ipc.send('get-tasks', this.currentPeriod);
     }
 
     add(text: string) {
-        // TODO: backend add task
-        const tasks = this.tasksRx.value;
-        id = id + 1;
-        tasks.push({ id, text, done: false, deleted: false });
-        this.tasksRx.next(tasks);
+        const newTask = { ...this.currentPeriod, text };
+        this.ipc.send('create-task', newTask);
     }
 
-    done(task: Task) {
-        // TODO: backend mark task as done
+    done({ id }: Task) {
+        this.ipc.send('check-task', { id, done: true });
+        this.updateTaskAfterMark(id, true);
+    }
+
+    revert({ id }: Task) {
+        this.ipc.send('check-task', { id, done: false });
+        this.updateTaskAfterMark(id, false);
+    }
+
+    private updateTaskAfterMark(id, done) {
         const tasks = this.tasksRx.value.map((t) => {
-            if (t.id !== task.id) {
+            if (t.id !== id) {
                 return t;
             }
 
             return {
                 ...t,
-                done: true,
+                done,
             };
         });
         this.tasksRx.next(tasks);
     }
 
-    revert(task: Task) {
-        // TODO: backend mark task as undone
-        const tasks = this.tasksRx.value.map((t) => {
-            if (t.id !== task.id) {
-                return t;
-            }
-
-            return {
-                ...t,
-                done: false,
-            };
+    private registerListeners() {
+        this.ipc.on('get-tasks-reply', (event, arg) => {
+            this.tasksRx.next(arg);
         });
-        this.tasksRx.next(tasks);
+
+        this.ipc.on('create-task-reply', (event, arg) => {
+            const tasks = this.tasksRx.value;
+            const { id, text, done, deleted } = arg;
+            tasks.push({ id, text, done, deleted });
+            this.tasksRx.next(tasks);
+        });
+
+        // TODO: right now, we're updating immediately after user action; not waiting for reply
+        // this.ipc.on('check-task-reply', (event, arg) => {
+        //     const { id, done } = arg;
+        //     const tasks = this.tasksRx.value.map((t) => {
+        //         if (t.id !== id) {
+        //             return t;
+        //         }
+
+        //         return {
+        //             ...t,
+        //             done,
+        //         };
+        //     });
+        //     this.tasksRx.next(tasks);
+        // });
     }
 }

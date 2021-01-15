@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { format } from 'date-fns';
-import { Period, PeriodType, SelectedPeriodService } from 'src/app/selected-period.service';
+import { Period, PeriodType } from 'src/app/interfaces';
+import { SelectedPeriodService } from 'src/app/selected-period.service';
 import { SubSink } from 'subsink';
 
 @Component({

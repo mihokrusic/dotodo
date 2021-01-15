@@ -1,5 +1,11 @@
 const { app, BrowserWindow } = require('electron');
-require('electron-reload')(__dirname);
+
+const env = process.env.NODE_ENV || 'development';
+if (env === 'development') {
+    require('electron-reload')(__dirname, { ignored: [/node_modules|[/\\]\./, /database.db/] });
+}
+
+require('./communication')();
 
 const ANGULAR_PATH = `file://${__dirname}/dotodo-web/dist/index.html`;
 
@@ -8,17 +14,23 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
+            nodeIntegration: true,
             webSecurity: false,
             contextIsolation: false,
-            devTools: true,
         },
     });
 
     win.setMenu(null);
     win.loadURL(ANGULAR_PATH);
 
-    win.webContents.openDevTools();
-    win.webContents.on('did-fail-load', () => {
+    win.webContents.openDevTools({ mode: 'detach' });
+
+    win.webContents.on('will-redirect', (event) => {
+        console.log('will redirect');
+    });
+
+    win.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+        console.log(errorCode, errorDescription, validatedURL);
         console.log('on browser reload it did-fail-load and reloaded the app');
         win.loadURL(ANGULAR_PATH);
     });

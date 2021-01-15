@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Task } from 'src/app/tasks.service';
+import { Task } from 'src/app/interfaces';
 
 @Component({
     selector: 'app-task',
@@ -12,9 +12,7 @@ export class TaskComponent implements OnInit {
     @Output() done = new EventEmitter<Task>();
     @Output() revert = new EventEmitter<Task>();
 
-    constructor() {
-        console.log('Task component constructor');
-    }
+    constructor() {}
 
     ngOnInit(): void {}
 

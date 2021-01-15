@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { Task } from 'src/app/tasks.service';
+import { Task } from 'src/app/interfaces';
 
 @Component({
     selector: 'app-tasks-progress',

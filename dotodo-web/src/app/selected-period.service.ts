@@ -1,18 +1,7 @@
 import { Injectable } from '@angular/core';
 import { addDays, addMonths, addWeeks, endOfMonth, endOfWeek, startOfMonth, startOfWeek } from 'date-fns';
 import { BehaviorSubject } from 'rxjs';
-
-export enum PeriodType {
-    Daily = 0,
-    Weekly = 1,
-    Monthly = 2,
-}
-
-export interface Period {
-    type: PeriodType;
-    startDate: Date;
-    endDate: Date;
-}
+import { Period, PeriodType } from './interfaces';
 
 const initialPeriod: Period = {
     type: PeriodType.Daily,

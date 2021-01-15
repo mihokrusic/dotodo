@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Task } from 'src/app/interfaces';
+import { SelectedPeriodService } from 'src/app/selected-period.service';
 import { SubSink } from 'subsink';
-import { Task, TasksService } from './../../tasks.service';
+import { TasksService } from './../../tasks.service';
 
 @Component({
     selector: 'app-tasks',
@@ -15,13 +17,20 @@ export class TasksComponent implements OnInit {
 
     showCompletedTasks = false;
 
-    constructor(private tasksService: TasksService) {}
+    constructor(
+        private selectedPeriodService: SelectedPeriodService,
+        private tasksService: TasksService,
+        private cdr: ChangeDetectorRef
+    ) {}
 
     ngOnInit() {
         this.subs.sink = this.tasksService.tasks$.subscribe((tasks) => {
             this.tasks = tasks.filter((t) => !t.done);
             this.completedTasks = tasks.filter((t) => t.done);
+            this.cdr.detectChanges();
         });
+
+        this.subs.sink = this.selectedPeriodService.currentPeriod$.subscribe((_) => this.tasksService.getTasks());
     }
 
     ngOnDestroy() {
@@ -33,7 +42,11 @@ export class TasksComponent implements OnInit {
     showHideCompletedTasks = () => (this.showCompletedTasks = !this.showCompletedTasks);
 
     taskAdd(text: string) {
-        this.tasksService.add(text);
+        try {
+            this.tasksService.add(text);
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     taskDone(task: Task) {
