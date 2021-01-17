@@ -28,31 +28,35 @@ export class TasksService {
         }
 
         this.selectedPeriodService.currentPeriod$.subscribe((period) => (this.currentPeriod = period));
-
-        this.registerListeners();
     }
 
-    getTasks() {
-        this.ipc.send('get-tasks', this.currentPeriod);
+    async getTasks() {
+        const result = await this.ipc.invoke('get-tasks', this.currentPeriod);
+        this.tasksRx.next(result);
     }
 
-    add(text: string) {
-        const newTask = { ...this.currentPeriod, text };
-        this.ipc.send('create-task', newTask);
+    async add(newText: string) {
+        const newTask = { ...this.currentPeriod, text: newText };
+        const result = await this.ipc.invoke('create-task', newTask);
+
+        const tasks = this.tasksRx.value;
+        const { id, text, done, deleted } = result;
+        tasks.push({ id, text, done, deleted });
+        this.tasksRx.next(tasks);
     }
 
-    done({ id }: Task) {
-        this.ipc.send('check-task', { id, done: true });
+    async done({ id }: Task) {
+        const result = await this.ipc.invoke('check-task', { id, done: true });
         this.updateTaskAfterMark(id, true);
     }
 
-    revert({ id }: Task) {
-        this.ipc.send('check-task', { id, done: false });
+    async revert({ id }: Task) {
+        const result = await this.ipc.invoke('check-task', { id, done: false });
         this.updateTaskAfterMark(id, false);
     }
 
-    delete({ id }: Task) {
-        this.ipc.send('delete-task', { id });
+    async delete({ id }: Task) {
+        const result = await this.ipc.invoke('delete-task', { id });
         this.removeTaskAfterDelete(id);
     }
 
@@ -77,22 +81,5 @@ export class TasksService {
             }
         });
         this.tasksRx.next(tasks);
-    }
-
-    private registerListeners() {
-        this.ipc.on('get-tasks-reply', (event, arg) => {
-            this.tasksRx.next(arg);
-        });
-
-        this.ipc.on('create-task-reply', (event, arg) => {
-            const tasks = this.tasksRx.value;
-            const { id, text, done, deleted } = arg;
-            tasks.push({ id, text, done, deleted });
-            this.tasksRx.next(tasks);
-        });
-
-        // TODO: right now, we're updating immediately after user action; not waiting for reply
-        // this.ipc.on('check-task-reply', (event, arg) => {});
-        // this.ipc.on('delete-task-reply', (event, arg) => {});
     }
 }
