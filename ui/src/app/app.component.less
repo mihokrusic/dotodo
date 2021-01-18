@@ -1,12 +1,51 @@
-div.main {
-    display: grid;
-    grid-gap: 16px;
+.customScrollbars() {
+    @colorGridScrollbarTrack: #dddddd;
+    @colorGridScrollbarThumb: #919191;
+    &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
 
-    .top-toolbar {
+    &::-webkit-scrollbar-track {
+        background: @colorGridScrollbarTrack;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: @colorGridScrollbarThumb;
+        border-radius: 3px;
+    }
+}
+
+div.main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .floating-toolbar {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 4px;
+        right: 4px;
         display: flex;
         justify-content: flex-end;
+        color: white;
+
+        button {
+            padding: 0px;
+            min-width: 32px;
+        }
+    }
+
+    .period-toolbar {
+        padding: 48px 32px 32px;
+        background-color: #114b5f;
+        color: white;
+    }
+
+    .tasks {
+        margin: 32px;
+        padding: 32px;
+        flex: 1;
+        overflow-y: auto;
+        .customScrollbars();
     }
 }

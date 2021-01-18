@@ -21,6 +21,12 @@ class TasksController {
             return task.toJSON();
         });
 
+        ipcMain.handle('update-task', async (event, arg) => {
+            log.info('update-task', arg);
+            const task = await this.tasksService.updateTask(arg.id, arg.text);
+            return task.toJSON();
+        });
+
         ipcMain.handle('check-task', async (event, arg) => {
             log.info('check-task');
             const task = await this.tasksService.markTask(arg.id, arg.done);

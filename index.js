@@ -16,14 +16,17 @@ if (env === 'development') {
 }
 
 let tray = null;
+let actuallyCloseApp = false;
 
 app.whenReady().then(() => {
     const mainWindow = createWindow();
 
     mainWindow.on('close', (event) => {
-        // TODO: this should be under settings, "on X close or minimize to tray?"
-        event.preventDefault();
-        mainWindow.hide();
+        if (!actuallyCloseApp) {
+            // TODO: this should be under settings, "on X close or minimize to tray?"
+            event.preventDefault();
+            mainWindow.hide();
+        }
     });
 
     // Create tray icon
@@ -35,7 +38,14 @@ app.whenReady().then(() => {
             click: () => BrowserWindow.getAllWindows()[0].show(),
         },
         { type: 'separator' },
-        { label: 'Quit', type: 'normal', click: () => app.quit() },
+        {
+            label: 'Quit',
+            type: 'normal',
+            click: () => {
+                actuallyCloseApp = true;
+                app.quit();
+            },
+        },
     ]);
     tray.setToolTip(mainWindow.title);
     tray.setContextMenu(contextMenu);

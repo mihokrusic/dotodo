@@ -37,11 +37,10 @@ export class TasksService {
 
     async add(newText: string) {
         const newTask = { ...this.currentPeriod, text: newText };
-        const result = await this.ipc.invoke('create-task', newTask);
+        const { id, text, done, deleted } = await this.ipc.invoke('create-task', newTask);
 
         const tasks = this.tasksRx.value;
-        const { id, text, done, deleted } = result;
-        tasks.push({ id, text, done, deleted });
+        tasks.unshift({ id, text, done, deleted });
         this.tasksRx.next(tasks);
     }
 
@@ -60,6 +59,11 @@ export class TasksService {
         const result = await this.ipc.invoke('delete-task', { id });
     }
 
+    async update({ id }: Task, newText: string) {
+        this.updateTaskAfterTextChange(id, newText);
+        const result = await this.ipc.invoke('update-task', { id, text: newText });
+    }
+
     private updateTaskAfterMark(id, done) {
         const tasks = this.tasksRx.value.map((t) => {
             if (t.id !== id) {
@@ -69,6 +73,20 @@ export class TasksService {
             return {
                 ...t,
                 done,
+            };
+        });
+        this.tasksRx.next(tasks);
+    }
+
+    private updateTaskAfterTextChange(id, text) {
+        const tasks = this.tasksRx.value.map((t) => {
+            if (t.id !== id) {
+                return t;
+            }
+
+            return {
+                ...t,
+                text,
             };
         });
         this.tasksRx.next(tasks);

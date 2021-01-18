@@ -60,12 +60,9 @@ class TaskService {
 
     async updateTask(id, text) {
         const item = await this.db.models.Task.findByPk(id);
-
         const result = await item.update({ text });
         return result;
     }
-
-    updateTask() {}
 }
 
 module.exports = TaskService;

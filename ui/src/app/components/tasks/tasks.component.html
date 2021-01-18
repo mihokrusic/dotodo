@@ -4,8 +4,9 @@
 <div class="tasks" cdkDropList>
     <app-task
         cdkDrag
-        [task]="item"
-        *ngFor="let item of tasks; trackBy: trackByFn"
+        [task]="task"
+        *ngFor="let task of tasks; trackBy: trackByFn"
+        (update)="taskUpdate(task, $event)"
         (done)="taskDone($event)"
         (delete)="taskDelete($event)"
     >
@@ -20,8 +21,9 @@
     </div>
     <div class="tasks" [class.hide]="!showCompletedTasks">
         <app-task
-            [task]="item"
-            *ngFor="let item of completedTasks; trackBy: trackByFn"
+            [task]="task"
+            *ngFor="let task of completedTasks; trackBy: trackByFn"
+            (update)="taskUpdate(task, $event)"
             (revert)="taskRevert($event)"
             (delete)="taskDelete($event)"
         >

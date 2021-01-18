@@ -60,4 +60,8 @@ export class TasksComponent implements OnInit {
     taskDelete(task: Task) {
         this.tasksService.delete(task);
     }
+
+    taskUpdate(task: Task, newText: string) {
+        this.tasksService.update(task, newText);
+    }
 }
