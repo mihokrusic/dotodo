@@ -46,18 +46,18 @@ export class TasksService {
     }
 
     async done({ id }: Task) {
-        const result = await this.ipc.invoke('check-task', { id, done: true });
         this.updateTaskAfterMark(id, true);
+        const result = await this.ipc.invoke('check-task', { id, done: true });
     }
 
     async revert({ id }: Task) {
-        const result = await this.ipc.invoke('check-task', { id, done: false });
         this.updateTaskAfterMark(id, false);
+        const result = await this.ipc.invoke('check-task', { id, done: false });
     }
 
     async delete({ id }: Task) {
-        const result = await this.ipc.invoke('delete-task', { id });
         this.removeTaskAfterDelete(id);
+        const result = await this.ipc.invoke('delete-task', { id });
     }
 
     private updateTaskAfterMark(id, done) {

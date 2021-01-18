@@ -1,4 +1,4 @@
-const { BrowserWindow, app, Tray, Menu, nativeImage } = require('electron');
+const { BrowserWindow, nativeImage } = require('electron');
 const path = require('path');
 const log = require('electron-log');
 
@@ -33,21 +33,6 @@ function createWindow() {
     return mainWindow;
 }
 
-function createTrayIcon(mainWindow) {
-    const tray = new Tray(nativeImage.createFromPath(path.join(__dirname, '/../assets/tasks.png')));
-    const contextMenu = Menu.buildFromTemplate([
-        { label: 'Open', type: 'normal', click: () => mainWindow.show() },
-        { label: 'Setings', type: 'normal' },
-        { type: 'separator' },
-        { label: 'Quit', type: 'normal', click: () => app.quit() },
-    ]);
-    tray.setToolTip('Do your TODOs.');
-    tray.setContextMenu(contextMenu);
-
-    return tray;
-}
-
 module.exports = {
     createWindow,
-    createTrayIcon,
 };

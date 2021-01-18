@@ -1,6 +1,8 @@
 <div class="container">
     <mat-icon class="drag">drag_indicator</mat-icon>
-    <div>{{ task.text }}</div>
+    <div>
+        <span>{{ task.text }}</span>
+    </div>
     <button mat-button class="done" *ngIf="!task.done" (click)="onTaskDone()">
         <mat-icon>check_circle</mat-icon>
     </button>
