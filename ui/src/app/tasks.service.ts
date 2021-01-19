@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { IpcRenderer } from 'electron';
 import { BehaviorSubject } from 'rxjs';
-import { Period, Task } from './interfaces';
+import { Period, PeriodType, Task } from './interfaces';
 import { SelectedPeriodService } from './selected-period.service';
 
 let id = 3;
@@ -33,6 +33,8 @@ export class TasksService {
     async getTasks() {
         const result = await this.ipc.invoke('get-tasks', this.currentPeriod);
         this.tasksRx.next(result);
+        // TODO: sort tasks, first is recurring?
+        console.log(result);
     }
 
     async add(newText: string) {
@@ -40,31 +42,51 @@ export class TasksService {
         const { id, text, done, deleted } = await this.ipc.invoke('create-task', newTask);
 
         const tasks = this.tasksRx.value;
-        tasks.unshift({ id, text, done, deleted });
+        tasks.unshift({ id, text, done, deleted, taskExists: true });
         this.tasksRx.next(tasks);
     }
 
-    async done({ id }: Task) {
-        this.updateTaskAfterMark(id, true);
-        const result = await this.ipc.invoke('check-task', { id, done: true });
-    }
-
-    async revert({ id }: Task) {
-        this.updateTaskAfterMark(id, false);
-        const result = await this.ipc.invoke('check-task', { id, done: false });
+    async done({ id }: Task, done: boolean) {
+        this.updateTaskAfterDone(id, done);
+        const { error, data } = await this.ipc.invoke('check-task', { id, done });
+        if (error) {
+            // TODO
+            alert(`Error: ${error}`);
+        }
     }
 
     async delete({ id }: Task) {
         this.removeTaskAfterDelete(id);
-        const result = await this.ipc.invoke('delete-task', { id });
+        const { error, data } = await this.ipc.invoke('delete-task', { id });
+        if (error) {
+            // TODO
+            alert(`Error: ${error}`);
+        }
     }
 
     async update({ id }: Task, newText: string) {
         this.updateTaskAfterTextChange(id, newText);
-        const result = await this.ipc.invoke('update-task', { id, text: newText });
+        const { error, data } = await this.ipc.invoke('update-task', { id, text: newText });
+        if (error) {
+            // TODO
+            alert(`Error: ${error}`);
+        }
     }
 
-    private updateTaskAfterMark(id, done) {
+    async repeatable({ id, text, recurringTaskId }: Task, repeat: boolean) {
+        this.updateTaskAfterRecurringChange(id, repeat);
+
+        const { error, data } = repeat
+            ? await this.ipc.invoke('make-task-repeatable', { id, text, type: PeriodType.Daily })
+            : await this.ipc.invoke('make-task-non-repeatable', { recurringTaskId });
+
+        if (error) {
+            // TODO
+            alert(`Error: ${error}`);
+        }
+    }
+
+    private updateTaskAfterDone(id: number, done: boolean) {
         const tasks = this.tasksRx.value.map((t) => {
             if (t.id !== id) {
                 return t;
@@ -78,7 +100,7 @@ export class TasksService {
         this.tasksRx.next(tasks);
     }
 
-    private updateTaskAfterTextChange(id, text) {
+    private updateTaskAfterTextChange(id: number, text: string) {
         const tasks = this.tasksRx.value.map((t) => {
             if (t.id !== id) {
                 return t;
@@ -92,7 +114,21 @@ export class TasksService {
         this.tasksRx.next(tasks);
     }
 
-    private removeTaskAfterDelete(id) {
+    private updateTaskAfterRecurringChange(id: number, recurring: boolean) {
+        const tasks = this.tasksRx.value.map((t) => {
+            if (t.id !== id) {
+                return t;
+            }
+
+            return {
+                ...t,
+                recurring,
+            };
+        });
+        this.tasksRx.next(tasks);
+    }
+
+    private removeTaskAfterDelete(id: number) {
         const tasks = this.tasksRx.value.filter((t) => {
             if (t.id !== id) {
                 return t;

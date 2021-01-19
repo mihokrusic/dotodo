@@ -1,13 +1,14 @@
 const { DataTypes, Model } = require('sequelize');
 
-class RecurringTasks extends Model {}
+class RecurringTask extends Model {}
 
 module.exports = (sequelize) => {
-    RecurringTasks.init(
+    return RecurringTask.init(
         {
-            id: { type: DataTypes.UUID, primaryKey: true },
-            type: { type: DataTypes.SMALLINT },
-            text: { type: DataTypes.STRING },
+            id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
+            type: { type: DataTypes.SMALLINT, allowNull: false },
+            text: { type: DataTypes.STRING, allowNull: false },
+            deleted: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
         },
         {
             sequelize,

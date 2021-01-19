@@ -1,4 +1,5 @@
 const { startOfMonth, startOfWeek } = require('date-fns');
+const { Op } = require('sequelize');
 
 const _getDate = (type, date) => {
     let taskDate;
@@ -22,7 +23,7 @@ class TaskService {
     }
 
     async getTasks(type, date) {
-        const results = await this.db.models.Task.findAll({
+        const tasks = await this.db.models.Task.findAll({
             where: {
                 type,
                 date: _getDate(type, date),
@@ -31,37 +32,100 @@ class TaskService {
             order: ['done', ['createdAt', 'desc']],
             raw: true,
         });
+        const existingRecurringIds = tasks.map((t) => t.recurringTaskId);
 
-        return results;
-    }
+        const recurringTasks = await this.db.models.RecurringTask.findAll({
+            where: {
+                id: {
+                    [Op.notIn]: existingRecurringIds,
+                },
+                type,
+                deleted: false,
+            },
+            raw: true,
+        });
 
-    async markTask(id, done) {
-        const item = await this.db.models.Task.findByPk(id);
-
-        const result = await item.update({ done });
-        return result;
-    }
-
-    async deleteTask(id, deleted) {
-        const item = await this.db.models.Task.findByPk(id);
-
-        const result = await item.update({ deleted });
-        return result;
+        return [
+            ...recurringTasks.map((r) => ({ ...r, recurring: true, taskExists: false })),
+            ...tasks.map((t) => ({ ...t, recurring: t.recurringTaskId !== null, taskExists: true })),
+        ];
     }
 
     async insertTask(type, date, text) {
-        const newItem = await this.db.models.Task.create({
+        const newTask = await this.db.models.Task.create({
             type,
             date: _getDate(type, date),
             text,
         });
-        return newItem;
+        return newTask;
+    }
+
+    async markTask(id, done) {
+        const task = await this.db.models.Task.findByPk(id);
+        if (task === null) {
+            throw new Error('Task does not exist.');
+        }
+
+        const result = await task.update({ done }, { raw: true });
+        return result;
     }
 
     async updateTask(id, text) {
-        const item = await this.db.models.Task.findByPk(id);
-        const result = await item.update({ text });
+        const task = await this.db.models.Task.findByPk(id);
+        if (task === null) {
+            throw new Error('Task does not exist.');
+        }
+
+        const result = await task.update({ text }, { raw: true });
         return result;
+    }
+
+    async deleteTask(id, deleted) {
+        const task = await this.db.models.Task.findByPk(id);
+        if (task === null) {
+            throw new Error('Task does not exist.');
+        }
+
+        const result = await task.update({ deleted }, { raw: true });
+        return result;
+    }
+
+    async makeTaskRepeatable(id, text, type) {
+        const task = await this.db.models.Task.findByPk(id);
+        if (task.dataValues.recurringTaskId !== null) {
+            throw new Error('Task is already a recurring task.');
+        }
+        const t = await this.db.transaction();
+        try {
+            const newRecurringTask = await this.db.models.RecurringTask.create(
+                {
+                    type,
+                    text,
+                },
+                { transaction: t }
+            );
+
+            const updatedTask = await task.update(
+                { recurringTaskId: newRecurringTask.dataValues.id },
+                { transaction: t }
+            );
+
+            await t.commit();
+            return updatedTask;
+        } catch (e) {
+            await t.rollback();
+            throw e;
+        }
+    }
+
+    async makeTaskNonRepeatable(recurringTaskId) {
+        // TODO: delete recurring task, update all tasks with recurringTaskId to recurringTaskId = null
+        // const recurringTask = await this.db.models.RecurringTask.findByPk(recurringTaskId);
+        // if (recurringTask === null) {
+        //     throw new Error('Recurring task does not exist.');
+        // }
+        // const result = await recurringTask.delete();
+        // return result;
     }
 }
 

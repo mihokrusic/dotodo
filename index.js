@@ -18,7 +18,15 @@ if (env === 'development') {
 let tray = null;
 let actuallyCloseApp = false;
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+    // Connect to DB
+    const db = await connectToDb(path.join(__dirname, 'assets/database.db'), log);
+
+    // Layers
+    const tasksService = new TasksService(db);
+    const tasksController = new TasksController(tasksService);
+
+    // Create main window
     const mainWindow = createWindow();
 
     mainWindow.on('close', (event) => {
@@ -55,6 +63,7 @@ app.whenReady().then(() => {
     globalShortcut.register('Alt+Shift+T', () => {
         BrowserWindow.getAllWindows()[0].show();
     });
+
     // TODO: this should only be in dev mode
     globalShortcut.register('CommandOrControl+Shift+I', () => mainWindow.webContents.openDevTools({ mode: 'detach' }));
 });
@@ -75,10 +84,3 @@ app.on('activate', () => {
         createWindow();
     }
 });
-
-// Connect to DB
-const db = connectToDb(path.join(__dirname, 'assets/database.db'), log);
-
-// Layers
-const tasksService = new TasksService(db);
-const tasksController = new TasksController(tasksService);

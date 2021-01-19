@@ -7,7 +7,6 @@ import { TasksService } from './../../tasks.service';
 @Component({
     selector: 'app-tasks',
     templateUrl: './tasks.component.html',
-    styleUrls: ['./tasks.component.less'],
 })
 export class TasksComponent implements OnInit {
     tasks: Task[] = [];
@@ -49,12 +48,8 @@ export class TasksComponent implements OnInit {
         }
     }
 
-    taskDone(task: Task) {
-        this.tasksService.done(task);
-    }
-
-    taskRevert(task: Task) {
-        this.tasksService.revert(task);
+    taskMark(task: Task, done: boolean) {
+        this.tasksService.done(task, done);
     }
 
     taskDelete(task: Task) {
@@ -63,5 +58,9 @@ export class TasksComponent implements OnInit {
 
     taskUpdate(task: Task, newText: string) {
         this.tasksService.update(task, newText);
+    }
+
+    taskRepeatable(task: Task, repeats: boolean) {
+        this.tasksService.repeatable(task, repeats);
     }
 }

@@ -4,15 +4,14 @@ import { Task } from 'src/app/interfaces';
 @Component({
     selector: 'app-task',
     templateUrl: './task.component.html',
-    styleUrls: ['./task.component.less'],
 })
 export class TaskComponent implements OnInit {
     @Input() task: Task;
 
     @Output() update = new EventEmitter<string>();
-    @Output() done = new EventEmitter<Task>();
-    @Output() revert = new EventEmitter<Task>();
-    @Output() delete = new EventEmitter<Task>();
+    @Output() mark = new EventEmitter<boolean>();
+    @Output() delete = new EventEmitter<void>();
+    @Output() repeatable = new EventEmitter<boolean>();
 
     text: string = '';
 
@@ -24,9 +23,11 @@ export class TaskComponent implements OnInit {
         this.text = this.task.text;
     }
 
-    onTaskDone = () => this.done.emit(this.task);
-    onTaskRevert = () => this.revert.emit(this.task);
-    onTaskDelete = () => this.delete.emit(this.task);
+    onTaskDone = () => this.mark.emit(true);
+    onTaskRevert = () => this.mark.emit(false);
+    onTaskDelete = () => this.delete.emit();
+    onTaskRepeatable = () => this.repeatable.emit(true);
+    onTaskNonRepeatable = () => this.repeatable.emit(false);
 
     onEscape() {
         this.text = this.oldText;

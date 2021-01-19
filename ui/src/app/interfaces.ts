@@ -3,6 +3,11 @@ export interface Task {
     text: string;
     done: boolean;
     deleted: boolean;
+    recurring?: boolean;
+    recurringTaskId?: number;
+    taskExists?: boolean;
+    updatedAt?: string;
+    createdAt?: string;
 }
 
 export enum PeriodType {

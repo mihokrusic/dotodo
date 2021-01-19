@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import './assets/base.less';
 
 * {
     box-sizing: border-box;
@@ -18,4 +19,16 @@ body {
 
 .mat-icon {
     vertical-align: middle;
+}
+
+.mat-menu-panel.task-menu {
+    .mat-menu-content {
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        button.mat-menu-item {
+            line-height: 36px;
+            height: 36px;
+        }
+    }
 }

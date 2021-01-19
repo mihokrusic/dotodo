@@ -1,5 +1,4 @@
-<app-tasks-progress [tasks]="tasks" [completedTasks]="completedTasks"></app-tasks-progress>
-
+<!-- <app-tasks-progress [tasks]="tasks" [completedTasks]="completedTasks"></app-tasks-progress> -->
 <app-task-new (add)="taskAdd($event)"></app-task-new>
 <div class="tasks" cdkDropList>
     <app-task
@@ -7,8 +6,9 @@
         [task]="task"
         *ngFor="let task of tasks; trackBy: trackByFn"
         (update)="taskUpdate(task, $event)"
-        (done)="taskDone($event)"
-        (delete)="taskDelete($event)"
+        (mark)="taskMark(task, $event)"
+        (delete)="taskDelete(task)"
+        (repeatable)="taskRepeatable(task, $event)"
     >
     </app-task>
 </div>
@@ -24,8 +24,9 @@
             [task]="task"
             *ngFor="let task of completedTasks; trackBy: trackByFn"
             (update)="taskUpdate(task, $event)"
-            (revert)="taskRevert($event)"
-            (delete)="taskDelete($event)"
+            (mark)="taskMark(task, $event)"
+            (delete)="taskDelete(task)"
+            (repeatable)="taskRepeatable(task)"
         >
         </app-task>
     </div>
