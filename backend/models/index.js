@@ -10,7 +10,6 @@ async function connectToDb(fileName, log) {
     const taskModel = Tasks(context);
     const recurringTaskModel = RecurringTasks(context);
 
-    // TODO: this creates foreign key with TitleCase, change it to lowerCase
     recurringTaskModel.hasMany(taskModel, { foreignKey: 'recurringTaskId' });
 
     // TODO: how to handle this on production?
