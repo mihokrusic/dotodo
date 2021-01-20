@@ -3,31 +3,16 @@ import { Op } from 'sequelize';
 import { RecurringTask } from './../models/RecurringTasks';
 import { Task } from './../models/Tasks';
 import { PeriodType } from '../interfaces/enums';
+import { convertDate } from '../utility/dates';
 
-const _getDate = (type: PeriodType, date: Date) => {
-    let taskDate;
-    switch (type) {
-        case 0:
-            taskDate = date;
-            break;
-        case 1:
-            taskDate = startOfWeek(date);
-            break;
-        case 2:
-            taskDate = startOfMonth(date);
-            break;
-    }
-    return taskDate;
-};
-
-export class TaskService {
+class TaskService {
     constructor() {}
 
     async getTasks(type: PeriodType, date: Date) {
         const tasks = await Task.findAll({
             where: {
                 type,
-                date: _getDate(type, date),
+                date: convertDate(type, date),
                 deleted: false,
             },
             order: ['done', ['createdAt', 'desc']],
@@ -55,7 +40,7 @@ export class TaskService {
     async insertTask(type: PeriodType, date: Date, text: string) {
         const newTask = await Task.create({
             type,
-            date: _getDate(type, date),
+            date: convertDate(type, date),
             text,
         });
         return newTask;
@@ -124,3 +109,5 @@ export class TaskService {
         // return result;
     }
 }
+
+export default new TaskService();

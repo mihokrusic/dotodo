@@ -2,7 +2,6 @@ import { Sequelize } from 'sequelize-typescript';
 import { Task } from './Tasks';
 import { RecurringTask } from './RecurringTasks';
 import { ElectronLog } from 'electron-log';
-import { TaskService } from './../services/tasks.service';
 
 export async function connectToDb(fileName: string, log: ElectronLog) {
     log.info(`Trying to open db at ${fileName}`);
@@ -16,10 +15,4 @@ export async function connectToDb(fileName: string, log: ElectronLog) {
     log.info('Connected to db. All models are synchronized successfully.');
 
     return context;
-}
-
-export function createService() {
-    const taskService = new TaskService();
-
-    return taskService;
 }

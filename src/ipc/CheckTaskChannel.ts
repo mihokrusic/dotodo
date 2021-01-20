@@ -1,7 +1,7 @@
 import { IpcMainEvent } from 'electron';
 import log from 'electron-log';
 import { IpcChannelInterfaceWithType } from 'src/interfaces/IPCChannelInterface';
-import { TaskService } from './../services/tasks.service';
+import taskService from './../services/tasks.service';
 
 interface Props {
     id: number;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export class CheckTaskChannel implements IpcChannelInterfaceWithType<Props> {
-    constructor(private taskService: TaskService) {}
+    constructor() {}
 
     getName(): string {
         return 'check-task';
@@ -19,7 +19,7 @@ export class CheckTaskChannel implements IpcChannelInterfaceWithType<Props> {
         log.info(this.getName(), JSON.stringify(args));
         try {
             const { id, done } = args;
-            const data = await this.taskService.markTask(id, done);
+            const data = await taskService.markTask(id, done);
             return {
                 error: null,
                 data,

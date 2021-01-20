@@ -1,11 +1,9 @@
 import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage, ipcMain } from 'electron';
 import log from 'electron-log';
 import { join } from 'path';
-import { Sequelize } from 'sequelize/types';
 import { IpcChannelInterface } from './interfaces/IPCChannelInterface';
 import ipcChannelFactory from './ipc';
-import { connectToDb, createService } from './models';
-import { TaskService } from './services/tasks.service';
+import { connectToDb } from './models';
 const env = process.env.NODE_ENV || 'development';
 
 let tray: Tray = null;
@@ -16,16 +14,12 @@ const ICON_PATH = join(__dirname, '/../assets/tasks.png');
 const DB_PATH = join(__dirname, '/../assets/database.db');
 
 class Main {
-    private db: Sequelize;
-    private taskService: TaskService;
-
     private mainWindow: BrowserWindow;
 
     async init() {
         // Connect to DB
-        this.db = await connectToDb(DB_PATH, log);
-        this.taskService = createService();
-        this.registerIpcChannels(ipcChannelFactory(this.taskService));
+        await connectToDb(DB_PATH, log);
+        this.registerIpcChannels(ipcChannelFactory());
 
         await app.whenReady();
 
