@@ -10,7 +10,7 @@ export async function connectToDb(fileName: string, log: ElectronLog) {
     context.addModels([Task, RecurringTask]);
 
     // TODO: how to handle this on production?
-    await context.sync();
+    // await context.sync({ alter: true });
 
     log.info('Connected to db. All models are synchronized successfully.');
 

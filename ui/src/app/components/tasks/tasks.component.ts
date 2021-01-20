@@ -44,7 +44,7 @@ export class TasksComponent implements OnInit {
         try {
             this.tasksService.add(text);
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
 

@@ -34,16 +34,23 @@ export class TasksService {
         const result = await this.ipc.invoke('get-tasks', this.currentPeriod);
         this.tasksRx.next(result);
         // TODO: sort tasks, first is recurring?
-        console.log(result);
     }
 
     async add(newText: string) {
         const newTask = { ...this.currentPeriod, text: newText };
-        const { id, text, done, deleted } = await this.ipc.invoke('create-task', newTask);
+        const {
+            error,
+            data: { id, text, done, deleted },
+        } = await this.ipc.invoke('create-task', newTask);
 
-        const tasks = this.tasksRx.value;
-        tasks.unshift({ id, text, done, deleted, taskExists: true });
-        this.tasksRx.next(tasks);
+        if (error) {
+            // TODO:
+            alert(`Error: ${error}`);
+        } else {
+            const tasks = this.tasksRx.value;
+            tasks.unshift({ id, text, done, deleted, taskExists: true });
+            this.tasksRx.next(tasks);
+        }
     }
 
     async done({ id }: Task, done: boolean) {
@@ -51,17 +58,17 @@ export class TasksService {
         this.updateTaskAfterDone(id, done);
         const { error, data } = await this.ipc.invoke('check-task', { id, done });
         if (error) {
-            // TODO
+            // TODO:
             alert(`Error: ${error}`);
         }
     }
 
     async delete({ id }: Task) {
-        // TODO: if taskExists === false, delete recurring task
+        // TODO: if taskExists === false, delete recurring task and create
         this.removeTaskAfterDelete(id);
         const { error, data } = await this.ipc.invoke('delete-task', { id });
         if (error) {
-            // TODO
+            // TODO:
             alert(`Error: ${error}`);
         }
     }
@@ -71,21 +78,35 @@ export class TasksService {
         this.updateTaskAfterTextChange(id, newText);
         const { error, data } = await this.ipc.invoke('update-task', { id, text: newText });
         if (error) {
-            // TODO
+            // TODO:
             alert(`Error: ${error}`);
         }
     }
 
-    async repeatable({ id, text, recurringTaskId }: Task, repeat: boolean) {
+    async repeatable(task: Task, repeat: boolean) {
         this.updateTaskAfterRecurringChange(id, repeat);
 
-        const { error, data } = repeat
-            ? await this.ipc.invoke('make-task-repeatable', { id, text, type: PeriodType.Daily })
-            : await this.ipc.invoke('make-task-non-repeatable', { recurringTaskId });
+        const recurringTaskId = task.taskExists ? task.recurringTaskId : task.id;
 
-        if (error) {
-            // TODO
-            alert(`Error: ${error}`);
+        let result = null;
+
+        if (repeat) {
+            result = await this.ipc.invoke('repeat-task', {
+                id: task.id,
+                text: task.text,
+                type: PeriodType.Daily,
+                startDate: this.currentPeriod.startDate,
+            });
+        } else {
+            result = await this.ipc.invoke('repeat-task-stop', {
+                recurringTaskId,
+                endDate: this.currentPeriod.startDate,
+            });
+        }
+
+        if (result.error) {
+            // TODO:
+            alert(`Error: ${result.error}`);
         }
     }
 

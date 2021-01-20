@@ -4,6 +4,7 @@ import { join } from 'path';
 import { IpcChannelInterface } from './interfaces/IPCChannelInterface';
 import ipcChannelFactory from './ipc';
 import { connectToDb } from './models';
+import { initTaskService } from './services/tasks.service';
 const env = process.env.NODE_ENV || 'development';
 
 let tray: Tray = null;
@@ -18,7 +19,8 @@ class Main {
 
     async init() {
         // Connect to DB
-        await connectToDb(DB_PATH, log);
+        const db = await connectToDb(DB_PATH, log);
+        initTaskService(db);
         this.registerIpcChannels(ipcChannelFactory());
 
         await app.whenReady();

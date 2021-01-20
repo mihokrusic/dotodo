@@ -15,7 +15,7 @@
         </button>
         <mat-menu class="task-menu" #moreMenu="matMenu" xPosition="before">
             <button mat-menu-item *ngIf="task.recurring" (click)="onTaskNonRepeatable()">Stop Repeating</button>
-            <button mat-menu-item *ngIf="!task.recurring" (click)="onTaskRepeatable()">Repeat Every Day</button>
+            <button mat-menu-item *ngIf="!task.recurring" (click)="onTaskRepeatable()">Repeat From Today</button>
             <button class="text-color-red" mat-menu-item (click)="onTaskDelete()">Delete</button>
         </mat-menu>
     </div>

@@ -2,6 +2,8 @@ import { CheckTaskChannel } from './CheckTaskChannel';
 import { CreateTaskChannel } from './CreateTaskChannel';
 import { DeleteTaskChannel } from './DeleteTaskChannel';
 import { GetTasksChannel } from './GetTasksChannel';
+import { RepeatTaskChannel } from './RepeatTaskChannel';
+import { StopRepeatingTaskChannel } from './StopRepeatingTaskChannel';
 import { UpdateTaskChannel } from './UpdateTaskChannel';
 
 export default function ipcChannelFactory() {
@@ -11,5 +13,7 @@ export default function ipcChannelFactory() {
         new UpdateTaskChannel(),
         new DeleteTaskChannel(),
         new CheckTaskChannel(),
+        new RepeatTaskChannel(),
+        new StopRepeatingTaskChannel(),
     ];
 }

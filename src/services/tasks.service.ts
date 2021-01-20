@@ -1,12 +1,13 @@
-import { startOfMonth, startOfWeek } from 'date-fns';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 import { RecurringTask } from './../models/RecurringTasks';
 import { Task } from './../models/Tasks';
 import { PeriodType } from '../interfaces/enums';
 import { convertDate } from '../utility/dates';
 
-class TaskService {
-    constructor() {}
+export class TaskService {
+    constructor(private db: Sequelize) {
+        this.db = db;
+    }
 
     async getTasks(type: PeriodType, date: Date) {
         const tasks = await Task.findAll({
@@ -24,6 +25,12 @@ class TaskService {
             where: {
                 id: {
                     [Op.notIn]: existingRecurringIds,
+                },
+                startDate: {
+                    [Op.lte]: date,
+                },
+                endDate: {
+                    [Op.gte]: date,
                 },
                 type,
                 deleted: false,
@@ -43,7 +50,7 @@ class TaskService {
             date: convertDate(type, date),
             text,
         });
-        return newTask;
+        return newTask.toJSON();
     }
 
     async markTask(id: number, done: boolean) {
@@ -73,41 +80,49 @@ class TaskService {
         return result.toJSON();
     }
 
-    async makeTaskRepeatable(id: number, text: string, type: PeriodType) {
-        // const task = await this.db.models.Task.findByPk(id);
-        // if (task.dataValues.recurringTaskId !== null) {
-        //     throw new Error('Task is already a recurring task.');
-        // }
-        // const t = await this.db.transaction();
-        // try {
-        //     const newRecurringTask = await this.db.models.RecurringTask.create(
-        //         {
-        //             type,
-        //             text,
-        //         },
-        //         { transaction: t }
-        //     );
-        //     const updatedTask = await task.update(
-        //         { recurringTaskId: newRecurringTask.dataValues.id },
-        //         { transaction: t }
-        //     );
-        //     await t.commit();
-        //     return updatedTask;
-        // } catch (e) {
-        //     await t.rollback();
-        //     throw e;
-        // }
+    async repeatTask(id: number, text: string, type: PeriodType, startDate: Date) {
+        const task = await Task.findByPk(id);
+        if (task.recurringTaskId !== null) {
+            throw new Error('Task is already a recurring task.');
+        }
+
+        const t = await this.db.transaction();
+        try {
+            const newRecurringTask = await RecurringTask.create(
+                {
+                    type,
+                    text,
+                    startDate,
+                },
+                { transaction: t }
+            );
+            const updatedTask = await task.update({ recurringTaskId: newRecurringTask.id }, { transaction: t });
+            await t.commit();
+
+            return updatedTask.toJSON();
+        } catch (e) {
+            await t.rollback();
+            throw e;
+        }
     }
 
-    async makeTaskNonRepeatable(recurringTaskId: number) {
-        // TODO: delete recurring task, update all tasks with recurringTaskId to recurringTaskId = null
-        // const recurringTask = await this.db.models.RecurringTask.findByPk(recurringTaskId);
-        // if (recurringTask === null) {
-        //     throw new Error('Recurring task does not exist.');
-        // }
-        // const result = await recurringTask.delete();
-        // return result;
+    async stopRepeatingTask(recurringTaskId: number, endDate: Date) {
+        const recurringTask = await RecurringTask.findByPk(recurringTaskId);
+        if (recurringTask === null) {
+            throw new Error('Recurring task does not exist.');
+        }
+
+        const result = await recurringTask.update({ endDate });
+        return result.toJSON();
     }
 }
 
-export default new TaskService();
+let _taskService: TaskService = null;
+
+export function initTaskService(db: Sequelize) {
+    _taskService = new TaskService(db);
+}
+
+export function getTaskService() {
+    return _taskService;
+}

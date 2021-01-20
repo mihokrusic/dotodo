@@ -1,14 +1,15 @@
 import { IpcMainEvent } from 'electron';
 import log from 'electron-log';
+import { PeriodType } from 'src/interfaces/enums';
 import { IpcChannelInterfaceWithType } from 'src/interfaces/IPCChannelInterface';
 import { TaskService, getTaskService } from './../services/tasks.service';
 
 interface Props {
-    id: number;
-    done: boolean;
+    recurringTaskId: number;
+    endDate: Date;
 }
 
-export class CheckTaskChannel implements IpcChannelInterfaceWithType<Props> {
+export class StopRepeatingTaskChannel implements IpcChannelInterfaceWithType<Props> {
     private taskService: TaskService;
 
     constructor() {
@@ -16,14 +17,15 @@ export class CheckTaskChannel implements IpcChannelInterfaceWithType<Props> {
     }
 
     getName(): string {
-        return 'check-task';
+        return 'repeat-task-stop';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {
         log.info(this.getName(), JSON.stringify(args));
+        const { recurringTaskId, endDate } = args;
+
         try {
-            const { id, done } = args;
-            const data = await this.taskService.markTask(id, done);
+            const data = await this.taskService.stopRepeatingTask(recurringTaskId, endDate);
             return {
                 error: null,
                 data,
