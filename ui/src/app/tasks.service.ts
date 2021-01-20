@@ -47,6 +47,7 @@ export class TasksService {
     }
 
     async done({ id }: Task, done: boolean) {
+        // TODO: if taskExists === false, insert task and mark it?
         this.updateTaskAfterDone(id, done);
         const { error, data } = await this.ipc.invoke('check-task', { id, done });
         if (error) {
@@ -56,6 +57,7 @@ export class TasksService {
     }
 
     async delete({ id }: Task) {
+        // TODO: if taskExists === false, delete recurring task
         this.removeTaskAfterDelete(id);
         const { error, data } = await this.ipc.invoke('delete-task', { id });
         if (error) {
@@ -65,6 +67,7 @@ export class TasksService {
     }
 
     async update({ id }: Task, newText: string) {
+        // TODO: if taskExists === false, update recurring task
         this.updateTaskAfterTextChange(id, newText);
         const { error, data } = await this.ipc.invoke('update-task', { id, text: newText });
         if (error) {
