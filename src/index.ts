@@ -1,33 +1,44 @@
 import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage, ipcMain } from 'electron';
 import log from 'electron-log';
+import * as isDev from 'electron-is-dev';
 import { join } from 'path';
 import { IpcChannelInterface } from './interfaces/IPCChannelInterface';
 import ipcChannelFactory from './ipc';
 import { connectToDb } from './models';
 import { initTaskService } from './services/tasks.service';
-const env = process.env.NODE_ENV || 'development';
 
 let tray: Tray = null;
 let actuallyCloseApp = false;
 
 const UI_PATH = join(__dirname, '/../ui/dist/index.html');
 const ICON_PATH = join(__dirname, '/../assets/tasks.png');
-const DB_PATH = join(__dirname, '/../assets/database.db');
+const DB_PATH = isDev ? join(__dirname, '/../database.db') : join(app.getPath('userData'), 'database.db');
+
+if (isDev) {
+    require('electron-reload')(join(__dirname, '/../ui'), { ignored: [/node_modules|[/\\]\./, /assets|[/\\]\./] });
+}
 
 class Main {
     private mainWindow: BrowserWindow;
 
     async init() {
+        log.info('Starting app');
         // Connect to DB
         const db = await connectToDb(DB_PATH, log);
         initTaskService(db);
         this.registerIpcChannels(ipcChannelFactory());
 
+        log.info('Registered services and channels');
+
         await app.whenReady();
+
+        log.info('App is ready');
 
         this.createWindow();
         this.createTrayIcon();
         this.registerShortcuts();
+
+        log.info('Window created; tray created; shortcuts registered');
 
         app.on('window-all-closed', () => {
             if (process.platform !== 'darwin') {
@@ -64,6 +75,7 @@ class Main {
                 nodeIntegration: true,
                 webSecurity: false,
                 contextIsolation: false,
+                enableRemoteModule: true,
             },
         });
 
@@ -116,10 +128,11 @@ class Main {
             BrowserWindow.getAllWindows()[0].show();
         });
 
-        // TODO: this should only be in dev mode
-        globalShortcut.register('CommandOrControl+Shift+I', () =>
-            this.mainWindow.webContents.openDevTools({ mode: 'detach' })
-        );
+        if (isDev) {
+            globalShortcut.register('CommandOrControl+Shift+I', () =>
+                this.mainWindow.webContents.openDevTools({ mode: 'detach' })
+            );
+        }
     }
 }
 

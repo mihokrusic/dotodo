@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { IpcRenderer } from 'electron';
+import { ElectronService } from 'ngx-electron';
 import { BehaviorSubject } from 'rxjs';
 import { Period, PeriodType, Task } from './interfaces';
 import { SelectedPeriodService } from './selected-period.service';
@@ -14,24 +15,13 @@ export class TasksService {
     tasks$ = this.tasksRx.asObservable();
 
     private currentPeriod: Period;
-    private ipc: IpcRenderer | undefined = void 0;
 
-    constructor(private selectedPeriodService: SelectedPeriodService) {
-        if ((window as any).require) {
-            try {
-                this.ipc = (window as any).require('electron').ipcRenderer;
-            } catch (e) {
-                throw e;
-            }
-        } else {
-            console.warn('Electron IPC was not loaded');
-        }
-
+    constructor(private selectedPeriodService: SelectedPeriodService, private electronService: ElectronService) {
         this.selectedPeriodService.currentPeriod$.subscribe((period) => (this.currentPeriod = period));
     }
 
     async getTasks() {
-        const result = await this.ipc.invoke('get-tasks', this.currentPeriod);
+        const result = await this.electronService.ipcRenderer.invoke('get-tasks', this.currentPeriod);
         this.tasksRx.next(result);
         // TODO: sort tasks, first is recurring?
     }
@@ -41,7 +31,7 @@ export class TasksService {
         const {
             error,
             data: { id, text, done, deleted },
-        } = await this.ipc.invoke('create-task', newTask);
+        } = await this.electronService.ipcRenderer.invoke('create-task', newTask);
 
         if (error) {
             // TODO:
@@ -56,7 +46,7 @@ export class TasksService {
     async done({ id }: Task, done: boolean) {
         // TODO: if taskExists === false, insert task and mark it?
         this.updateTaskAfterDone(id, done);
-        const { error, data } = await this.ipc.invoke('check-task', { id, done });
+        const { error, data } = await this.electronService.ipcRenderer.invoke('check-task', { id, done });
         if (error) {
             // TODO:
             alert(`Error: ${error}`);
@@ -66,7 +56,7 @@ export class TasksService {
     async delete({ id }: Task) {
         // TODO: if taskExists === false, delete recurring task and create
         this.removeTaskAfterDelete(id);
-        const { error, data } = await this.ipc.invoke('delete-task', { id });
+        const { error, data } = await this.electronService.ipcRenderer.invoke('delete-task', { id });
         if (error) {
             // TODO:
             alert(`Error: ${error}`);
@@ -76,7 +66,7 @@ export class TasksService {
     async update({ id }: Task, newText: string) {
         // TODO: if taskExists === false, update recurring task
         this.updateTaskAfterTextChange(id, newText);
-        const { error, data } = await this.ipc.invoke('update-task', { id, text: newText });
+        const { error, data } = await this.electronService.ipcRenderer.invoke('update-task', { id, text: newText });
         if (error) {
             // TODO:
             alert(`Error: ${error}`);
@@ -91,14 +81,14 @@ export class TasksService {
         let result = null;
 
         if (repeat) {
-            result = await this.ipc.invoke('repeat-task', {
+            result = await this.electronService.ipcRenderer.invoke('repeat-task', {
                 id: task.id,
                 text: task.text,
                 type: PeriodType.Daily,
                 startDate: this.currentPeriod.startDate,
             });
         } else {
-            result = await this.ipc.invoke('repeat-task-stop', {
+            result = await this.electronService.ipcRenderer.invoke('repeat-task-stop', {
                 recurringTaskId,
                 endDate: this.currentPeriod.startDate,
             });

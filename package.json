@@ -1,23 +1,51 @@
 {
     "name": "dotodo",
-    "version": "1.0.0",
+    "productName": "Do Todos",
+    "version": "0.1.0",
     "description": "Simple TODOs tracker",
-    "main": "index.js",
+    "main": "./dist/index.js",
     "scripts": {
         "build": "tsc",
         "build-watch": "tsc -w",
-        "start": "electron ./dist/index.js"
+        "start": "electron .",
+        "build-installer": "electron-builder"
+    },
+    "build": {
+        "appId": "dotodo",
+        "extends": null,
+        "directories": {
+            "output": "installer"
+        },
+        "files": [
+            "assets/**/*",
+            "dist/**/*",
+            "ui/dist/**/*",
+            "package.json"
+        ],
+        "win": {
+            "target": [
+                "nsis"
+            ],
+            "icon": "assets/tasks.ico"
+        },
+        "nsis": {
+            "uninstallDisplayName": "Do Todos",
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        }
     },
     "author": "Miho Krusic",
     "license": "ISC",
     "devDependencies": {
-        "electron": "^11.1.1"
+        "electron": "^11.1.1",
+        "electron-builder": "^22.9.1"
     },
     "dependencies": {
         "@types/node": "^14.14.22",
         "@types/validator": "^13.1.3",
         "date-fns": "^2.16.1",
         "electron-debug": "^3.2.0",
+        "electron-is-dev": "^1.2.0",
         "electron-log": "^4.3.1",
         "electron-reload": "^1.5.0",
         "reflect-metadata": "^0.1.13",

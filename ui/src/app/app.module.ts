@@ -14,6 +14,7 @@ import { TaskComponent } from './components/task/task.component';
 import { TasksProgressComponent } from './components/tasks-progress/tasks-progress.component';
 import { TaskNewComponent } from './components/task-new/task-new.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxElectronModule } from 'ngx-electron';
 
 const MATERIAL_MODULES = [MatButtonModule, MatIconModule, MatDividerModule, MatMenuModule];
 
@@ -32,6 +33,7 @@ const MATERIAL_MODULES = [MatButtonModule, MatIconModule, MatDividerModule, MatM
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
+        NgxElectronModule,
         ...MATERIAL_MODULES,
     ],
     providers: [],
