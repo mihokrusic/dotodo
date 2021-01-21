@@ -7,7 +7,6 @@ import { SubSink } from 'subsink';
 @Component({
     selector: 'app-period-toolbar',
     templateUrl: './period-toolbar.component.html',
-    styleUrls: ['./period-toolbar.component.less'],
 })
 export class PeriodToolbarComponent implements OnInit {
     currentPeriod: Period;

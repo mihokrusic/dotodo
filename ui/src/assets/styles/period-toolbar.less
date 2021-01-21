@@ -1,4 +1,4 @@
-:host {
+app-period-toolbar {
     display: flex;
     align-content: center;
 
@@ -15,6 +15,22 @@
         span.title {
             font-size: 3rem;
             line-height: 3rem;
+        }
+    }
+
+    .buttons {
+        display: flex;
+        align-items: center;
+
+        button {
+            padding: 0;
+            min-width: 0;
+            margin-left: 16px;
+
+            mat-icon {
+                height: inherit;
+                width: inherit;
+            }
         }
     }
 }

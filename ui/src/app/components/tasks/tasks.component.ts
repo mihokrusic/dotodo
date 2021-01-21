@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Task } from 'src/app/interfaces';
+import { DeleteChoice, Task } from 'src/app/interfaces';
 import { SelectedPeriodService } from 'src/app/selected-period.service';
 import { SubSink } from 'subsink';
 import { TasksService } from './../../tasks.service';
@@ -48,19 +48,8 @@ export class TasksComponent implements OnInit {
         }
     }
 
-    taskMark(task: Task, done: boolean) {
-        this.tasksService.mark(task, done);
-    }
-
-    taskDelete(task: Task) {
-        this.tasksService.delete(task);
-    }
-
-    taskUpdate(task: Task, newText: string) {
-        this.tasksService.update(task, newText);
-    }
-
-    taskRepeatable(task: Task, repeats: boolean) {
-        this.tasksService.repeatable(task, repeats);
-    }
+    taskMark = (task: Task, done: boolean) => this.tasksService.mark(task, done);
+    taskDelete = (task: Task, deleteChoice: DeleteChoice) => this.tasksService.delete(task, deleteChoice);
+    taskUpdate = (task: Task, newText: string) => this.tasksService.update(task, newText);
+    taskRepeatable = (task: Task, repeats: boolean) => this.tasksService.repeatable(task, repeats);
 }

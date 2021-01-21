@@ -19,7 +19,7 @@
             <button class="text-color-red" mat-menu-item *ngIf="!task.repeating" (click)="onTaskDelete()">
                 Delete
             </button>
-            <button class="text-color-red" mat-menu-item *ngIf="task.repeating" (click)="onTaskDeleteThis()">
+            <button class="text-color-red" mat-menu-item *ngIf="task.repeating" (click)="onTaskDeleteSingle()">
                 Delete This Task
             </button>
             <button class="text-color-red" mat-menu-item *ngIf="task.repeating" (click)="onTaskDeleteAll()">

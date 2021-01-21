@@ -25,6 +25,14 @@ app-tasks {
         align-items: center;
 
         button {
+            padding: 0;
+
+            &:hover {
+                .mat-button-focus-overlay {
+                    opacity: 0 !important;
+                }
+            }
+
             mat-icon {
                 transition: 0.1s ease-in-out;
             }

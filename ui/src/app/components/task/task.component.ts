@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Task } from 'src/app/interfaces';
+import { DeleteChoice, Task } from 'src/app/interfaces';
 
 @Component({
     selector: 'app-task',
@@ -10,7 +10,7 @@ export class TaskComponent implements OnInit {
 
     @Output() update = new EventEmitter<string>();
     @Output() mark = new EventEmitter<boolean>();
-    @Output() delete = new EventEmitter<void>();
+    @Output() delete = new EventEmitter<DeleteChoice>();
     @Output() repeatable = new EventEmitter<boolean>();
 
     text: string = '';
@@ -25,9 +25,9 @@ export class TaskComponent implements OnInit {
 
     onTaskDone = () => this.mark.emit(true);
     onTaskRevert = () => this.mark.emit(false);
-    onTaskDelete = () => this.delete.emit();
-    onTaskDeleteThis = () => this.delete.emit();
-    onTaskDeleteAll = () => this.delete.emit();
+    onTaskDelete = () => this.delete.emit(DeleteChoice.Self);
+    onTaskDeleteSingle = () => this.delete.emit(DeleteChoice.RepeatSelf);
+    onTaskDeleteAll = () => this.delete.emit(DeleteChoice.RepeatAll);
     onTaskRepeatable = () => this.repeatable.emit(true);
     onTaskNonRepeatable = () => this.repeatable.emit(false);
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ElectronService } from 'ngx-electron';
 import { BehaviorSubject } from 'rxjs';
-import { Period, PeriodType, Task } from './interfaces';
+import { DeleteChoice, Period, PeriodType, Task } from './interfaces';
 import { SelectedPeriodService } from './selected-period.service';
 
 @Injectable({
@@ -18,10 +18,8 @@ export class TasksService {
     }
 
     async getTasks() {
-        const result = await this.electronService.ipcRenderer.invoke('get-tasks', this.currentPeriod);
+        const result = await this.electronService.ipcRenderer.invoke('task:get', this.currentPeriod);
         this.tasksRx.next(result);
-        console.log(result);
-
         // TODO: sort tasks, first is repeating?
     }
 
@@ -30,7 +28,7 @@ export class TasksService {
         const {
             error,
             data: { id, text, done, deleted },
-        } = await this.electronService.ipcRenderer.invoke('create-task', newTask);
+        } = await this.electronService.ipcRenderer.invoke('task:create', newTask);
 
         if (error) {
             alert(`Error: ${error}`);
@@ -42,12 +40,12 @@ export class TasksService {
     }
 
     async update({ id, repeatTask, taskRepeatId }: Task, newText: string) {
-        const isRepeatingTask = repeatTask || taskRepeatId !== null;
         this.updateTaskAfterTextChange(id, newText);
 
         let result = null;
-        if (!isRepeatingTask) {
-            result = await this.electronService.ipcRenderer.invoke('update-task', { id, text: newText });
+        const isRepeatingOrLinkedToRepeatingTask = repeatTask || taskRepeatId !== null;
+        if (!isRepeatingOrLinkedToRepeatingTask) {
+            result = await this.electronService.ipcRenderer.invoke('task:update', { id, text: newText });
         } else {
             result = await this.electronService.ipcRenderer.invoke('repeat:update', {
                 id: taskRepeatId ?? id,
@@ -60,21 +58,38 @@ export class TasksService {
         }
     }
 
-    async mark({ id }: Task, done: boolean) {
-        // TODO: if taskExists === false, insert task and mark it?
+    async mark({ id, repeatTask }: Task, done: boolean) {
         this.updateTaskAfterDone(id, done);
-        const { error, data } = await this.electronService.ipcRenderer.invoke('check-task', { id, done });
-        if (error) {
-            alert(`Error: ${error}`);
+
+        let result = null;
+        const isRepeatingTask = repeatTask;
+        if (!isRepeatingTask) {
+            result = await this.electronService.ipcRenderer.invoke('task:check', { id, done });
+        } else {
+            result = await this.electronService.ipcRenderer.invoke('repeat:check', {
+                id,
+                done,
+                date: this.currentPeriod.startDate,
+            });
+        }
+
+        if (result.error) {
+            alert(`Error: ${result.error}`);
         }
     }
 
-    async delete({ id }: Task) {
-        // TODO: if taskExists === false, delete repeating task and create
+    async delete({ id, taskRepeatId }: Task, deleteChoice: DeleteChoice) {
         this.removeTaskAfterDelete(id);
-        const { error, data } = await this.electronService.ipcRenderer.invoke('delete-task', { id });
-        if (error) {
-            alert(`Error: ${error}`);
+
+        let result = null;
+        if (deleteChoice !== DeleteChoice.RepeatAll) {
+            result = await this.electronService.ipcRenderer.invoke('task:delete', { id });
+        } else {
+            result = await this.electronService.ipcRenderer.invoke('repeat:delete', { id: taskRepeatId ?? id });
+        }
+
+        if (result.error) {
+            alert(`Error: ${result.error}`);
         }
     }
 

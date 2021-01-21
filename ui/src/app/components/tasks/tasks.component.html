@@ -7,14 +7,20 @@
         *ngFor="let task of tasks; trackBy: trackByFn"
         (update)="taskUpdate(task, $event)"
         (mark)="taskMark(task, $event)"
-        (delete)="taskDelete(task)"
+        (delete)="taskDelete(task, $event)"
         (repeatable)="taskRepeatable(task, $event)"
     >
     </app-task>
 </div>
 <div>
     <div class="completed">
-        <button mat-button [class.expanded]="showCompletedTasks" (click)="showHideCompletedTasks()">
+        <button
+            mat-button
+            disableRipple
+            class="text-10"
+            [class.expanded]="showCompletedTasks"
+            (click)="showHideCompletedTasks()"
+        >
             Completed ({{ completedTasks.length }})
             <mat-icon>chevron_right</mat-icon>
         </button>
@@ -25,7 +31,7 @@
             *ngFor="let task of completedTasks; trackBy: trackByFn"
             (update)="taskUpdate(task, $event)"
             (mark)="taskMark(task, $event)"
-            (delete)="taskDelete(task)"
+            (delete)="taskDelete(task, $event)"
             (repeatable)="taskRepeatable(task)"
         >
         </app-task>

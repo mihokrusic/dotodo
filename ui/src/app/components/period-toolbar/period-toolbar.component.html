@@ -12,13 +12,14 @@
         <span class="title">{{ getMonth() }}</span>
     </ng-container>
 </div>
-<!-- <button type="button" (click)="switch(PeriodType.Daily)">D</button>
-    <button type="button" (click)="switch(PeriodType.Weekly)">W</button>
-    <button type="button" (click)="switch(PeriodType.Monthly)">M</button>
-    <button type="button" (click)="now()">Now</button> -->
-<button mat-button disableRipple type="button" (click)="prev()">
-    <mat-icon>navigate_before</mat-icon>
-</button>
-<button mat-button disableRipple type="button" (click)="next()">
-    <mat-icon>navigate_next</mat-icon>
-</button>
+<div class="buttons">
+    <button mat-button disableRipple type="button" title="Today" (click)="now()">
+        <mat-icon class="text-30">today</mat-icon>
+    </button>
+    <button mat-button disableRipple type="button" title="Yesterday" (click)="prev()">
+        <mat-icon class="text-30">navigate_before</mat-icon>
+    </button>
+    <button mat-button disableRipple type="button" title="Tomorrow" (click)="next()">
+        <mat-icon class="text-30">navigate_next</mat-icon>
+    </button>
+</div>
