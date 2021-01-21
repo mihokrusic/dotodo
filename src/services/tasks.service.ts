@@ -1,5 +1,5 @@
 import { Op, Sequelize } from 'sequelize';
-import { RecurringTask } from './../models/RecurringTasks';
+import { TaskRepeat } from '../models/TaskRepeat';
 import { Task } from './../models/Tasks';
 import { PeriodType } from '../interfaces/enums';
 import { convertDate } from '../utility/dates';
@@ -19,18 +19,21 @@ export class TaskService {
             order: ['done', ['createdAt', 'desc']],
             raw: true,
         });
-        const existingRecurringIds = tasks.map((t) => t.recurringTaskId);
+        const existingTaskRepeatIds = tasks.map((t) => t.taskRepeatId);
 
-        const recurringTasks = await RecurringTask.findAll({
+        const repeatingTasks = await TaskRepeat.findAll({
             where: {
                 id: {
-                    [Op.notIn]: existingRecurringIds,
+                    [Op.notIn]: existingTaskRepeatIds,
                 },
                 startDate: {
                     [Op.lte]: date,
                 },
                 endDate: {
-                    [Op.gte]: date,
+                    [Op.or]: {
+                        [Op.eq]: null,
+                        [Op.gte]: date,
+                    },
                 },
                 type,
                 deleted: false,
@@ -39,8 +42,8 @@ export class TaskService {
         });
 
         return [
-            ...recurringTasks.map((r) => ({ ...r, recurring: true, taskExists: false })),
-            ...tasks.map((t) => ({ ...t, recurring: t.recurringTaskId !== null, taskExists: true })),
+            ...repeatingTasks.map((r) => ({ ...r, repeating: true, repeatTask: true })),
+            ...tasks.map((t) => ({ ...t, repeating: t.taskRepeatId !== null, repeatTask: false })),
         ];
     }
 
@@ -77,42 +80,6 @@ export class TaskService {
             throw new Error('Task does not exist.');
         }
         const result = await task.update({ deleted });
-        return result.toJSON();
-    }
-
-    async repeatTask(id: number, text: string, type: PeriodType, startDate: Date) {
-        const task = await Task.findByPk(id);
-        if (task.recurringTaskId !== null) {
-            throw new Error('Task is already a recurring task.');
-        }
-
-        const t = await this.db.transaction();
-        try {
-            const newRecurringTask = await RecurringTask.create(
-                {
-                    type,
-                    text,
-                    startDate,
-                },
-                { transaction: t }
-            );
-            const updatedTask = await task.update({ recurringTaskId: newRecurringTask.id }, { transaction: t });
-            await t.commit();
-
-            return updatedTask.toJSON();
-        } catch (e) {
-            await t.rollback();
-            throw e;
-        }
-    }
-
-    async stopRepeatingTask(recurringTaskId: number, endDate: Date) {
-        const recurringTask = await RecurringTask.findByPk(recurringTaskId);
-        if (recurringTask === null) {
-            throw new Error('Recurring task does not exist.');
-        }
-
-        const result = await recurringTask.update({ endDate });
         return result.toJSON();
     }
 }

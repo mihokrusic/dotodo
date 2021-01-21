@@ -11,7 +11,6 @@ export class AppComponent {
     constructor(private electronService: ElectronService) {}
 
     ngOnInit() {
-        console.log(this.electronService);
         this.appVersion = this.electronService.remote.app.getVersion();
     }
 }

@@ -2,7 +2,7 @@ import { IpcMainEvent } from 'electron';
 import log from 'electron-log';
 import { PeriodType } from 'src/interfaces/enums';
 import { IpcChannelInterfaceWithType } from 'src/interfaces/IPCChannelInterface';
-import { TaskService, getTaskService } from './../services/tasks.service';
+import { getTaskRepeatService, TaskRepeatService } from '../services/tasks-repeat.service';
 
 interface Props {
     id: number;
@@ -11,15 +11,15 @@ interface Props {
     startDate: Date;
 }
 
-export class RepeatTaskChannel implements IpcChannelInterfaceWithType<Props> {
-    private taskService: TaskService;
+export class RepeatStartChannel implements IpcChannelInterfaceWithType<Props> {
+    private repeatTaskService: TaskRepeatService;
 
     constructor() {
-        this.taskService = getTaskService();
+        this.repeatTaskService = getTaskRepeatService();
     }
 
     getName(): string {
-        return 'repeat-task';
+        return 'repeat:start';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {
@@ -27,7 +27,7 @@ export class RepeatTaskChannel implements IpcChannelInterfaceWithType<Props> {
         const { id, text, type, startDate } = args;
 
         try {
-            const data = await this.taskService.repeatTask(id, text, type, startDate);
+            const data = await this.repeatTaskService.repeatTask(id, text, type, startDate);
             return {
                 error: null,
                 data,

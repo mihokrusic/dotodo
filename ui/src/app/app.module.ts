@@ -29,11 +29,11 @@ const MATERIAL_MODULES = [MatButtonModule, MatIconModule, MatDividerModule, MatM
     ],
     imports: [
         BrowserModule,
-        AppRoutingModule,
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
         NgxElectronModule,
+        AppRoutingModule,
         ...MATERIAL_MODULES,
     ],
     providers: [],

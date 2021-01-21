@@ -1,6 +1,6 @@
 import { Table, Column, Model, CreatedAt, UpdatedAt, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { DataTypes } from 'sequelize';
-import { RecurringTask } from './RecurringTasks';
+import { TaskRepeat } from './TaskRepeat';
 
 @Table
 export class Task extends Model {
@@ -44,12 +44,12 @@ export class Task extends Model {
     })
     deleted: boolean;
 
-    @ForeignKey(() => RecurringTask)
+    @ForeignKey(() => TaskRepeat)
     @Column
-    recurringTaskId: number;
+    taskRepeatId: number;
 
-    @BelongsTo(() => RecurringTask)
-    recurringTask: RecurringTask;
+    @BelongsTo(() => TaskRepeat)
+    taskRepeat: TaskRepeat;
 
     @CreatedAt
     createdAt: Date;

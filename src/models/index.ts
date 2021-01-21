@@ -1,13 +1,13 @@
 import { Sequelize } from 'sequelize-typescript';
 import { Task } from './Tasks';
-import { RecurringTask } from './RecurringTasks';
+import { TaskRepeat } from './TaskRepeat';
 import { ElectronLog } from 'electron-log';
 
 export async function connectToDb(fileName: string, log: ElectronLog) {
     log.info(`Trying to open db at ${fileName}`);
 
     const context = new Sequelize({ dialect: 'sqlite', storage: fileName, logging: false });
-    context.addModels([Task, RecurringTask]);
+    context.addModels([Task, TaskRepeat]);
 
     // TODO: how to handle this on production?
     await context.sync();

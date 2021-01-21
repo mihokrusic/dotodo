@@ -3,9 +3,9 @@ export interface Task {
     text: string;
     done: boolean;
     deleted: boolean;
-    recurring?: boolean;
-    recurringTaskId?: number;
-    taskExists?: boolean;
+    repeating?: boolean;
+    taskRepeatId?: number;
+    repeatTask?: boolean;
     updatedAt?: string;
     createdAt?: string;
 }

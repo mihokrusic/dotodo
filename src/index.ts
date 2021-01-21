@@ -6,6 +6,7 @@ import { IpcChannelInterface } from './interfaces/IPCChannelInterface';
 import ipcChannelFactory from './ipc';
 import { connectToDb } from './models';
 import { initTaskService } from './services/tasks.service';
+import { initTaskRepeatService } from './services/tasks-repeat.service';
 
 let tray: Tray = null;
 let actuallyCloseApp = false;
@@ -26,6 +27,7 @@ class Main {
         // Connect to DB
         const db = await connectToDb(DB_PATH, log);
         initTaskService(db);
+        initTaskRepeatService(db);
         this.registerIpcChannels(ipcChannelFactory());
 
         log.info('Registered services and channels');

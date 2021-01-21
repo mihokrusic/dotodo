@@ -3,7 +3,7 @@ import { Model, HasMany, Column, CreatedAt, Table, UpdatedAt } from 'sequelize-t
 import { Task } from './Tasks';
 
 @Table
-export class RecurringTask extends Model {
+export class TaskRepeat extends Model {
     @Column({ type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false })
     id: number;
 

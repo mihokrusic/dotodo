@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="repeat" *ngIf="task.recurring"></div>
+    <div class="repeat" *ngIf="task.repeating"></div>
     <div class="text">
         <input type="text" [(ngModel)]="text" (focus)="onFocus()" (blur)="onBlur()" (keyup.escape)="onEscape()" />
     </div>
@@ -14,9 +14,17 @@
             <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu class="task-menu" #moreMenu="matMenu" xPosition="before">
-            <button mat-menu-item *ngIf="task.recurring" (click)="onTaskNonRepeatable()">Stop Repeating</button>
-            <button mat-menu-item *ngIf="!task.recurring" (click)="onTaskRepeatable()">Repeat From Today</button>
-            <button class="text-color-red" mat-menu-item (click)="onTaskDelete()">Delete</button>
+            <button mat-menu-item *ngIf="task.repeating" (click)="onTaskNonRepeatable()">Stop Repeating</button>
+            <button mat-menu-item *ngIf="!task.repeating" (click)="onTaskRepeatable()">Repeat From Today</button>
+            <button class="text-color-red" mat-menu-item *ngIf="!task.repeating" (click)="onTaskDelete()">
+                Delete
+            </button>
+            <button class="text-color-red" mat-menu-item *ngIf="task.repeating" (click)="onTaskDeleteThis()">
+                Delete This Task
+            </button>
+            <button class="text-color-red" mat-menu-item *ngIf="task.repeating" (click)="onTaskDeleteAll()">
+                Delete All Tasks
+            </button>
         </mat-menu>
     </div>
 </div>

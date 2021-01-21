@@ -26,6 +26,8 @@ export class TaskComponent implements OnInit {
     onTaskDone = () => this.mark.emit(true);
     onTaskRevert = () => this.mark.emit(false);
     onTaskDelete = () => this.delete.emit();
+    onTaskDeleteThis = () => this.delete.emit();
+    onTaskDeleteAll = () => this.delete.emit();
     onTaskRepeatable = () => this.repeatable.emit(true);
     onTaskNonRepeatable = () => this.repeatable.emit(false);
 

@@ -36,7 +36,7 @@ export class TasksComponent implements OnInit {
         this.subs.unsubscribe();
     }
 
-    trackByFn = (_: number, item: Task) => item.id;
+    trackByFn = (_: number, item: Task) => `${item.id}-${item.taskRepeatId}`;
 
     showHideCompletedTasks = () => (this.showCompletedTasks = !this.showCompletedTasks);
 
@@ -49,7 +49,7 @@ export class TasksComponent implements OnInit {
     }
 
     taskMark(task: Task, done: boolean) {
-        this.tasksService.done(task, done);
+        this.tasksService.mark(task, done);
     }
 
     taskDelete(task: Task) {
