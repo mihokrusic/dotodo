@@ -17,7 +17,7 @@ export class CreateTaskChannel implements IpcChannelInterfaceWithType<Props> {
     }
 
     getName(): string {
-        return 'create-task';
+        return 'task:create';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {

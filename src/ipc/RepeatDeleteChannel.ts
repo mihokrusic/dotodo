@@ -1,30 +1,30 @@
 import { IpcMainEvent } from 'electron';
 import log from 'electron-log';
 import { IpcChannelInterfaceWithType } from 'src/interfaces/IPCChannelInterface';
-import { TaskService, getTaskService } from './../services/tasks.service';
+import { getTaskRepeatService, TaskRepeatService } from '../services/tasks-repeat.service';
 
 interface Props {
     id: number;
     text: string;
 }
 
-export class UpdateTaskChannel implements IpcChannelInterfaceWithType<Props> {
-    private taskService: TaskService;
+export class RepeatDeleteChannel implements IpcChannelInterfaceWithType<Props> {
+    private repeatTaskService: TaskRepeatService;
 
     constructor() {
-        this.taskService = getTaskService();
+        this.repeatTaskService = getTaskRepeatService();
     }
 
     getName(): string {
-        return 'task:update';
+        return 'repeat:delete';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {
         log.info(this.getName(), JSON.stringify(args));
-        const { id, text } = args;
+        const { id } = args;
 
         try {
-            const data = await this.taskService.updateTask(id, text);
+            const data = await this.repeatTaskService.deleteTaskRepeat(args.id, true);
             return {
                 error: null,
                 data,

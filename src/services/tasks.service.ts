@@ -10,21 +10,38 @@ export class TaskService {
     }
 
     async getTasks(type: PeriodType, date: Date) {
-        const tasks = await Task.findAll({
+        const singleTasks = await Task.findAll({
             where: {
                 type,
                 date: convertDate(type, date),
-                deleted: false,
+                taskRepeatId: null,
             },
             order: ['done', ['createdAt', 'desc']],
             raw: true,
         });
-        const existingTaskRepeatIds = tasks.map((t) => t.taskRepeatId);
+
+        const repeatSingleTasks = await Task.findAll({
+            where: {
+                type,
+                date: convertDate(type, date),
+            },
+            include: [
+                {
+                    model: TaskRepeat,
+                    where: {
+                        deleted: false,
+                    },
+                },
+            ],
+            raw: true,
+        });
+
+        const allSingleTasks = [...singleTasks, ...repeatSingleTasks];
 
         const repeatingTasks = await TaskRepeat.findAll({
             where: {
                 id: {
-                    [Op.notIn]: existingTaskRepeatIds,
+                    [Op.notIn]: allSingleTasks.map((t) => t.taskRepeatId),
                 },
                 startDate: {
                     [Op.lte]: date,
@@ -43,7 +60,9 @@ export class TaskService {
 
         return [
             ...repeatingTasks.map((r) => ({ ...r, repeating: true, repeatTask: true })),
-            ...tasks.map((t) => ({ ...t, repeating: t.taskRepeatId !== null, repeatTask: false })),
+            ...allSingleTasks
+                .filter((t) => !t.deleted)
+                .map((t) => ({ ...t, repeating: t.taskRepeatId !== null, repeatTask: false })),
         ];
     }
 
@@ -56,7 +75,7 @@ export class TaskService {
         return newTask.toJSON();
     }
 
-    async markTask(id: number, done: boolean) {
+    async checkTask(id: number, done: boolean) {
         const task = await Task.findByPk(id);
         if (task === null) {
             throw new Error('Task does not exist.');

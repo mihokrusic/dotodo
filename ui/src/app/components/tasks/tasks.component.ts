@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { listAddRemoveTrigger } from 'src/app/animations';
 import { DeleteChoice, Task } from 'src/app/interfaces';
 import { SelectedPeriodService } from 'src/app/selected-period.service';
 import { SubSink } from 'subsink';
@@ -7,6 +8,7 @@ import { TasksService } from './../../tasks.service';
 @Component({
     selector: 'app-tasks',
     templateUrl: './tasks.component.html',
+    animations: [listAddRemoveTrigger],
 })
 export class TasksComponent implements OnInit {
     tasks: Task[] = [];

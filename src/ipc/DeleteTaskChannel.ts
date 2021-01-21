@@ -15,7 +15,7 @@ export class DeleteTaskChannel implements IpcChannelInterfaceWithType<Props> {
     }
 
     getName(): string {
-        return 'delete-task';
+        return 'task:delete';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {

@@ -34,14 +34,13 @@ export class TasksService {
             alert(`Error: ${error}`);
         } else {
             const tasks = this.tasksRx.value;
-            tasks.unshift({ id, text, done, deleted, repeatTask: false });
+            tasks.unshift({ id, text, done, deleted, repeatTask: false, taskRepeatId: null });
             this.tasksRx.next(tasks);
         }
     }
 
     async update({ id, repeatTask, taskRepeatId }: Task, newText: string) {
         this.updateTaskAfterTextChange(id, newText);
-
         let result = null;
         const isRepeatingOrLinkedToRepeatingTask = repeatTask || taskRepeatId !== null;
         if (!isRepeatingOrLinkedToRepeatingTask) {

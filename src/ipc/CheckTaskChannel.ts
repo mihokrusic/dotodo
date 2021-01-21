@@ -16,14 +16,15 @@ export class CheckTaskChannel implements IpcChannelInterfaceWithType<Props> {
     }
 
     getName(): string {
-        return 'check-task';
+        return 'task:check';
     }
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {
         log.info(this.getName(), JSON.stringify(args));
+        const { id, done } = args;
+
         try {
-            const { id, done } = args;
-            const data = await this.taskService.markTask(id, done);
+            const data = await this.taskService.checkTask(id, done);
             return {
                 error: null,
                 data,

@@ -68,7 +68,7 @@ class Main {
 
     private createWindow() {
         this.mainWindow = new BrowserWindow({
-            width: 700,
+            width: 600,
             height: 800,
             // frame: false,
             title: 'Do your TODOs',

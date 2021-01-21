@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize';
 import { TaskRepeat } from '../models/TaskRepeat';
 import { Task } from './../models/Tasks';
 import { PeriodType } from '../interfaces/enums';
+import { convertDate } from '../utility/dates';
 
 export class TaskRepeatService {
     constructor(private db: Sequelize) {
@@ -16,6 +17,32 @@ export class TaskRepeatService {
         await Task.update({ text }, { where: { taskRepeatId: id } });
         const result = await task.update({ text });
         return result.toJSON();
+    }
+
+    async deleteTaskRepeat(id: number, deleted: boolean) {
+        const task = await TaskRepeat.findByPk(id);
+        if (task === null) {
+            throw new Error('Repeating task does not exist.');
+        }
+        const result = await task.update({ deleted });
+        return result.toJSON();
+    }
+
+    async checkTaskRepeat(id: number, done: boolean, date: Date) {
+        const repeatingTask = await TaskRepeat.findByPk(id);
+        if (repeatingTask === null) {
+            throw new Error('Repeating task does not exist.');
+        }
+
+        const newTask = await Task.create({
+            type: repeatingTask.type,
+            date: convertDate(repeatingTask.type, date),
+            text: repeatingTask.text,
+            taskRepeatId: repeatingTask.id,
+            done,
+        });
+
+        return newTask.toJSON();
     }
 
     async repeatTask(id: number, text: string, type: PeriodType, startDate: Date) {
