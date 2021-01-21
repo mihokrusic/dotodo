@@ -20,7 +20,7 @@ export class TasksService {
     async getTasks() {
         const result = await this.electronService.ipcRenderer.invoke('task:get', this.currentPeriod);
         this.tasksRx.next(result);
-        // TODO: sort tasks, first is repeating?
+        // TODO: sort tasks, first is repeating, or sort by updatedAt, or just leave it as createdat since thats how keep does it?
     }
 
     async add(newText: string) {

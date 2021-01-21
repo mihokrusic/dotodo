@@ -93,12 +93,17 @@ class Main {
             log.info(this.mainWindow.getPosition());
         });
 
+        this.mainWindow.on('minimize', () => {
+            this.mainWindow.hide();
+        });
+
         this.mainWindow.on('close', (event) => {
-            if (!actuallyCloseApp) {
-                // TODO: this should be under settings, "on X close or minimize to tray?"
-                event.preventDefault();
-                this.mainWindow.hide();
-            }
+            // TODO: settings, "on X close or minimize to tray?"
+            // Right now, we'll just close it when users press X
+            // if (!actuallyCloseApp) {
+            //     event.preventDefault();
+            //     this.mainWindow.hide();
+            // }
         });
     }
 
