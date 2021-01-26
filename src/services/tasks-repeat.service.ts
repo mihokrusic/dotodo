@@ -19,12 +19,25 @@ export class TaskRepeatService {
         return result.toJSON();
     }
 
-    async deleteTaskRepeat(id: number, deleted: boolean) {
-        const task = await TaskRepeat.findByPk(id);
-        if (task === null) {
+    async deleteTaskRepeat(id: number, date: Date, deleted: boolean) {
+        const repeatingTask = await TaskRepeat.findByPk(id);
+        if (repeatingTask === null) {
             throw new Error('Repeating task does not exist.');
         }
-        const result = await task.update({ deleted });
+
+        let result;
+        if (!date) {
+            result = await repeatingTask.update({ deleted });
+        } else {
+            result = await Task.create({
+                type: repeatingTask.type,
+                date: convertDate(repeatingTask.type, date),
+                text: repeatingTask.text,
+                taskRepeatId: repeatingTask.id,
+                done: false,
+                deleted: true,
+            });
+        }
         return result.toJSON();
     }
 

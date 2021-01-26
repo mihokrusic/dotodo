@@ -27,7 +27,8 @@ app-task {
             width: 4px;
             background: @colorTaskRepeat;
             left: -1px;
-            height: 100%;
+            top: -1px;
+            bottom: -1px;
             border-radius: 4px;
         }
 
@@ -67,8 +68,13 @@ app-task {
                 width: inherit;
             }
 
-            button.done mat-icon {
-                color: @colorGreen;
+            button.done {
+                &:hover,
+                &:focus {
+                    mat-icon {
+                        color: @colorGreen;
+                    }
+                }
             }
 
             button.revert mat-icon {

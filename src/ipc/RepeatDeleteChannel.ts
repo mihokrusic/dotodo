@@ -5,7 +5,7 @@ import { getTaskRepeatService, TaskRepeatService } from '../services/tasks-repea
 
 interface Props {
     id: number;
-    text: string;
+    date?: Date;
 }
 
 export class RepeatDeleteChannel implements IpcChannelInterfaceWithType<Props> {
@@ -15,16 +15,14 @@ export class RepeatDeleteChannel implements IpcChannelInterfaceWithType<Props> {
         this.repeatTaskService = getTaskRepeatService();
     }
 
-    getName(): string {
-        return 'repeat:delete';
-    }
+    getName = () => 'repeat:delete';
 
     async handle(event: IpcMainEvent, args: Props): Promise<any> {
         log.info(this.getName(), JSON.stringify(args));
-        const { id } = args;
+        const { id, date } = args;
 
         try {
-            const data = await this.repeatTaskService.deleteTaskRepeat(args.id, true);
+            const data = await this.repeatTaskService.deleteTaskRepeat(id, date, true);
             return {
                 error: null,
                 data,

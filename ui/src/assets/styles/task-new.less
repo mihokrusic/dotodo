@@ -1,7 +1,7 @@
 app-task-new {
     .container {
         border-radius: 4px;
-        border: dashed 4px #45b5dc;
+        border: dashed 2px #45b5dc;
         display: flex;
         align-items: stretch;
         user-select: none;
@@ -16,10 +16,23 @@ app-task-new {
             outline: none;
         }
 
-        button mat-icon {
-            font-size: 2rem;
-            height: inherit;
-            width: inherit;
+        button {
+            padding: 0;
+            min-width: 32px;
+            margin-right: 16px;
+
+            &:hover,
+            &:focus {
+                mat-icon {
+                    color: @colorGreen;
+                }
+            }
+
+            mat-icon {
+                font-size: 2rem;
+                height: inherit;
+                width: inherit;
+            }
         }
     }
 }

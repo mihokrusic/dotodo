@@ -20,6 +20,7 @@ export class TasksService {
     async getTasks() {
         const result = await this.electronService.ipcRenderer.invoke('task:get', this.currentPeriod);
         this.tasksRx.next(result);
+        console.log(result);
         // TODO: sort tasks, first is repeating, or sort by updatedAt, or just leave it as createdat since thats how keep does it?
     }
 
@@ -81,10 +82,23 @@ export class TasksService {
         this.removeTaskAfterDelete(id);
 
         let result = null;
-        if (deleteChoice !== DeleteChoice.RepeatAll) {
-            result = await this.electronService.ipcRenderer.invoke('task:delete', { id });
-        } else {
-            result = await this.electronService.ipcRenderer.invoke('repeat:delete', { id: taskRepeatId ?? id });
+        switch (deleteChoice) {
+            case DeleteChoice.Self:
+                result = await this.electronService.ipcRenderer.invoke('task:delete', { id });
+                break;
+            case DeleteChoice.RepeatSelf:
+                if (taskRepeatId) {
+                    result = await this.electronService.ipcRenderer.invoke('task:delete', { id });
+                } else {
+                    result = await this.electronService.ipcRenderer.invoke('repeat:delete', {
+                        id,
+                        date: this.currentPeriod.startDate,
+                    });
+                }
+                break;
+            case DeleteChoice.RepeatAll:
+                result = await this.electronService.ipcRenderer.invoke('repeat:delete', { id: taskRepeatId ?? id });
+                break;
         }
 
         if (result.error) {

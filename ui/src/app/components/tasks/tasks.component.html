@@ -2,7 +2,6 @@
 <app-task-new (add)="taskAdd($event)"></app-task-new>
 <div class="tasks" cdkDropList>
     <app-task
-        @listAddRemoveTrigger
         cdkDrag
         [task]="task"
         *ngFor="let task of tasks; trackBy: trackByFn"
@@ -28,7 +27,6 @@
     </div>
     <div class="tasks" [class.hide]="!showCompletedTasks">
         <app-task
-            @listAddRemoveTrigger
             [task]="task"
             *ngFor="let task of completedTasks; trackBy: trackByFn"
             (update)="taskUpdate(task, $event)"
