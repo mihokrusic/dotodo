@@ -7,6 +7,8 @@ import ipcChannelFactory from './ipc';
 import { connectToDb } from './models';
 import { initTaskService } from './services/tasks.service';
 import { initTaskRepeatService } from './services/tasks-repeat.service';
+import { initSettingsService, SettingsService } from './services/settings.service';
+import { SettingCode } from './models/Settings';
 
 let tray: Tray = null;
 let actuallyCloseApp = false;
@@ -22,12 +24,15 @@ if (isDev) {
 class Main {
     private mainWindow: BrowserWindow;
 
+    private settings: SettingsService;
+
     async init() {
         log.info('Starting app');
         // Connect to DB
         const db = await connectToDb(DB_PATH, log);
         initTaskService(db);
         initTaskRepeatService(db);
+        this.settings = initSettingsService(db);
         this.registerIpcChannels(ipcChannelFactory());
 
         log.info('Registered services and channels');
@@ -36,7 +41,7 @@ class Main {
 
         log.info('App is ready');
 
-        this.createWindow();
+        await this.createWindow();
         this.createTrayIcon();
         this.registerShortcuts();
 
@@ -66,10 +71,13 @@ class Main {
         });
     }
 
-    private createWindow() {
+    private async createWindow() {
+        const windowSize = await this.settings.getSize();
+        const windowPosition = await this.settings.getPosition();
+
         this.mainWindow = new BrowserWindow({
-            width: 600,
-            height: 800,
+            width: windowSize ? windowSize[0] : 600,
+            height: windowSize ? windowSize[1] : 800,
             // frame: false,
             title: 'Do your TODOs',
             icon: nativeImage.createFromPath(ICON_PATH),
@@ -81,6 +89,10 @@ class Main {
             },
         });
 
+        if (windowPosition) {
+            this.mainWindow.setPosition(windowPosition[0], windowPosition[1]);
+        }
+
         this.mainWindow.setMenu(null);
         this.mainWindow.loadURL(UI_PATH);
 
@@ -90,7 +102,13 @@ class Main {
         });
 
         this.mainWindow.on('moved', () => {
-            log.info(this.mainWindow.getPosition());
+            log.info('moved', this.mainWindow.getPosition());
+            this.settings.saveSetting(SettingCode.WindowPosition, this.mainWindow.getPosition().map(String).join(','));
+        });
+
+        this.mainWindow.on('resized', () => {
+            log.info('resized', this.mainWindow.getPosition());
+            this.settings.saveSetting(SettingCode.WindowSize, this.mainWindow.getSize().map(String).join(','));
         });
 
         this.mainWindow.on('minimize', () => {

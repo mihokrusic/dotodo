@@ -107,6 +107,7 @@ let _taskService: TaskService = null;
 
 export function initTaskService(db: Sequelize) {
     _taskService = new TaskService(db);
+    return getTaskService();
 }
 
 export function getTaskService() {

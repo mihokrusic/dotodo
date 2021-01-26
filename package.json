@@ -32,8 +32,7 @@
         },
         "nsis": {
             "uninstallDisplayName": "Do Todos",
-            "oneClick": false,
-            "allowToChangeInstallationDirectory": true
+            "oneClick": true
         },
         "portable": {
             "useZip": true
