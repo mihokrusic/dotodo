@@ -14,11 +14,19 @@ app-task {
         line-height: 64px;
         padding-left: 24px;
 
+        &:focus-within {
+            border: solid 1px teal;
+        }
+
+        &:not(:focus-within) {
+            border: solid 1px transparent;
+        }
+
         .repeat {
             position: absolute;
             width: 4px;
             background: @colorTaskRepeat;
-            left: 0;
+            left: -1px;
             height: 100%;
             border-radius: 4px;
         }

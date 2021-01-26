@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage, ipcMain } from 'electron';
+import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage, ipcMain, ipcRenderer } from 'electron';
 import log from 'electron-log';
 import * as isDev from 'electron-is-dev';
 import { join } from 'path';
@@ -131,7 +131,7 @@ class Main {
             {
                 label: 'Open',
                 type: 'normal',
-                click: () => BrowserWindow.getAllWindows()[0].show(),
+                click: () => this.showMainWindow(),
             },
             { type: 'separator' },
             {
@@ -145,19 +145,26 @@ class Main {
         ]);
         tray.setToolTip(BrowserWindow.getAllWindows()[0].title);
         tray.setContextMenu(contextMenu);
-        tray.on('double-click', () => BrowserWindow.getAllWindows()[0].show());
+        tray.on('double-click', () => this.showMainWindow());
     }
 
     private registerShortcuts() {
-        globalShortcut.register('Alt+Shift+T', () => {
-            BrowserWindow.getAllWindows()[0].show();
-        });
+        globalShortcut.register('Alt+Shift+T', () => this.showMainWindow());
 
         if (isDev) {
             globalShortcut.register('CommandOrControl+Shift+I', () =>
                 this.mainWindow.webContents.openDevTools({ mode: 'detach' })
             );
         }
+    }
+
+    private showMainWindow() {
+        const mainWindow = BrowserWindow.getAllWindows()[0];
+
+        // if (!mainWindow.isVisible) {
+        mainWindow.webContents.send('app:activate');
+        BrowserWindow.getAllWindows()[0].show();
+        // }
     }
 }
 

@@ -1,5 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { ElectronService } from 'ngx-electron';
 
 @Component({
     selector: 'app-task-new',
@@ -8,13 +9,19 @@ import { FormBuilder, Validators } from '@angular/forms';
 export class TaskNewComponent implements OnInit {
     @Output() add = new EventEmitter<string>();
 
+    @ViewChild('newTask') newTaskInput: ElementRef;
+
     newTaskForm = this.formBuilder.group({
         text: ['', Validators.required],
     });
 
-    constructor(private formBuilder: FormBuilder) {}
+    constructor(private formBuilder: FormBuilder, private electronService: ElectronService) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.electronService.ipcRenderer.on('app:activate', () => {
+            this.newTaskInput.nativeElement.focus();
+        });
+    }
 
     onSubmit() {
         if (!this.newTaskForm.valid) {

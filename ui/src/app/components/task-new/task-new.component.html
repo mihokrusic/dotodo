@@ -1,5 +1,5 @@
 <form class="container" spellcheck="false" [formGroup]="newTaskForm" (ngSubmit)="onSubmit()">
-    <input formControlName="text" type="text" placeholder="Add New Task..." />
+    <input #newTask formControlName="text" type="text" placeholder="Add New Task..." />
     <button mat-button>
         <mat-icon>add_circle</mat-icon>
     </button>
