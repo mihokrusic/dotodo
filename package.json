@@ -5,8 +5,11 @@
     "description": "Do your to-do's",
     "main": "./dist/index.js",
     "scripts": {
-        "build": "tsc",
-        "build-watch": "tsc -w",
+        "build:clean": "rimraf ./dist/",
+        "build:copy": "copyfiles ./assets/*.* ./dist/",
+        "build:prepare": "npm run build:clean && npm run build:copy",
+        "build": "npm run build:prepare && tsc",
+        "build-watch": "npm run build:prepare && tsc -w",
         "start": "electron .",
         "build-installer": "cd ui && npm run build-prod && cd .. && electron-builder",
         "build-installer:skip-ui": "electron-builder"
@@ -41,8 +44,10 @@
     "author": "Miho Krusic",
     "license": "ISC",
     "devDependencies": {
+        "copyfiles": "^2.4.1",
         "electron": "^11.1.1",
-        "electron-builder": "^22.3.6"
+        "electron-builder": "^22.3.6",
+        "rimraf": "^3.0.2"
     },
     "dependencies": {
         "@types/node": "^14.14.22",

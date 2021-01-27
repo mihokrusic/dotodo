@@ -2,23 +2,23 @@ import { app, BrowserWindow, globalShortcut, Tray, Menu, nativeImage, ipcMain, i
 import log from 'electron-log';
 import * as isDev from 'electron-is-dev';
 import { join } from 'path';
-import { IpcChannelInterface } from './interfaces/IPCChannelInterface';
-import ipcChannelFactory from './ipc';
-import { connectToDb } from './models';
-import { initTaskService } from './services/tasks.service';
-import { initTaskRepeatService } from './services/tasks-repeat.service';
-import { initSettingsService, SettingsService } from './services/settings.service';
-import { SettingCode } from './models/Settings';
+import { IpcChannelInterface } from './electron/interfaces/IPCChannelInterface';
+import ipcChannelFactory from './electron/ipc';
+import { connectToDb } from './electron/models';
+import { initTaskService } from './electron/services/tasks.service';
+import { initTaskRepeatService } from './electron/services/tasks-repeat.service';
+import { initSettingsService, SettingsService } from './electron/services/settings.service';
+import { SettingCode } from './electron/models/Settings';
 
 let tray: Tray = null;
 let actuallyCloseApp = false;
 
-const UI_PATH = join(__dirname, '/../ui/dist/index.html');
-const ICON_PATH = join(__dirname, '/../assets/tasks.png');
+const UI_PATH = join(__dirname, '/ui/index.html');
+const ICON_PATH = join(__dirname, '/assets/tasks.png');
 const DB_PATH = isDev ? join(__dirname, '/../database.db') : join(app.getPath('userData'), 'database.db');
 
 if (isDev) {
-    require('electron-reload')(join(__dirname, '/../ui'), { ignored: [/node_modules|[/\\]\./, /assets|[/\\]\./] });
+    require('electron-reload')(join(__dirname, '/ui'));
 }
 
 class Main {
@@ -96,8 +96,9 @@ class Main {
         this.mainWindow.setMenu(null);
         this.mainWindow.loadURL(UI_PATH);
 
-        this.mainWindow.webContents.on('did-fail-load', () => {
-            log.info('did-fail-load event: reloading app');
+        this.mainWindow.webContents.on('did-fail-load', (e) => {
+            log.info(e.target);
+            // log.info('did-fail-load event: reloading app');
             this.mainWindow.loadURL(UI_PATH);
         });
 
